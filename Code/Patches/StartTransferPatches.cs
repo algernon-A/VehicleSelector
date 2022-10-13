@@ -10,6 +10,7 @@ namespace VehicleSelector
     using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
+    using ColossalFramework;
     using ColossalFramework.Math;
     using HarmonyLib;
 
@@ -57,11 +58,15 @@ namespace VehicleSelector
         {
             Logging.Message("transpiling ", original.DeclaringType, ":", original.Name);
 
-            // Reflection to get original and inserted methods for calls.
-            MethodInfo getRandomVehicle = typeof(VehicleManager).GetMethod(nameof(VehicleManager.GetRandomVehicleInfo), new Type[] { typeof(Randomizer).MakeByRefType(), typeof(ItemClass.Service), typeof(ItemClass.SubService), typeof(ItemClass.Level) });
-            MethodInfo getRandomVehicleType = typeof(VehicleManager).GetMethod(nameof(VehicleManager.GetRandomVehicleInfo), new Type[] { typeof(Randomizer).MakeByRefType(), typeof(ItemClass.Service), typeof(ItemClass.SubService), typeof(ItemClass.Level), typeof(VehicleInfo.VehicleType) });
-            MethodInfo chooseVehicle = typeof(StartTransferPatches).GetMethod(nameof(StartTransferPatches.ChooseVehicle));
-            MethodInfo chooseVehicleType = typeof(StartTransferPatches).GetMethod(nameof(StartTransferPatches.ChooseVehicleType));
+            // Reflection to get original methods for calls.
+            MethodInfo getRandomVehicle = AccessTools.Method(typeof(VehicleManager), nameof(VehicleManager.GetRandomVehicleInfo), new Type[] { typeof(Randomizer).MakeByRefType(), typeof(ItemClass.Service), typeof(ItemClass.SubService), typeof(ItemClass.Level) });
+            MethodInfo getRandomVehicleType = AccessTools.Method(typeof(VehicleManager), nameof(VehicleManager.GetRandomVehicleInfo), new Type[] { typeof(Randomizer).MakeByRefType(), typeof(ItemClass.Service), typeof(ItemClass.SubService), typeof(ItemClass.Level), typeof(VehicleInfo.VehicleType) });
+            MethodInfo getSelectedVehicle = AccessTools.Method(typeof(PlayerBuildingAI), nameof(PlayerBuildingAI.GetSelectedVehicle));
+
+            // Reflection to get inserted methods for calls.
+            MethodInfo chooseVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.ChooseVehicle));
+            MethodInfo chooseVehicleType = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.ChooseVehicleType));
+            MethodInfo selectVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.GetSelectedVehicle));
 
             // Instruction enumerator.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -72,35 +77,66 @@ namespace VehicleSelector
                 // Get next instruction.
                 CodeInstruction instruction = instructionsEnumerator.Current;
 
-                // If this instruction calls the GetRandomVehicle method, then replace it with a call to our custom method.
-                if (instruction.opcode == OpCodes.Callvirt)
+                // If this instruction calls the GetSelectedVehicle method, then replace it with a call to our custom method.
+                if (instruction.Calls(getSelectedVehicle))
                 {
-                    // Standard version.
-                    if (instruction.Calls(getRandomVehicle))
-                    {
-                        // Get any labels attached to original instruction.
-                        List<Label> labels = instruction.labels;
+                    // Add material param to call.
+                    yield return new CodeInstruction(OpCodes.Ldarg_3);
+                    instruction = new CodeInstruction(OpCodes.Call, selectVehicle);
+                }
 
-                        // Add buildingID and material params to call, restoring any original labels against the insert start.
-                        yield return new CodeInstruction(OpCodes.Ldarg_1) { labels = labels };
-                        yield return new CodeInstruction(OpCodes.Ldarg_3);
-                        instruction = new CodeInstruction(OpCodes.Call, chooseVehicle);
-                        Logging.Message("transpiled");
-                    }
+                // If this instruction calls the GetRandomVehicle method, then replace it with a call to our custom method.
+                // Standard version.
+                else if (instruction.Calls(getRandomVehicle))
+                {
+                    // Get any labels attached to original instruction.
+                    List<Label> labels = instruction.labels;
 
-                    // Overload with additional VehicleType argument.
-                    else if (instruction.Calls(getRandomVehicleType))
-                    {
-                        // Add buildingID and material params to call.
-                        yield return new CodeInstruction(OpCodes.Ldarg_1);
-                        yield return new CodeInstruction(OpCodes.Ldarg_3);
-                        instruction = new CodeInstruction(OpCodes.Call, chooseVehicleType);
-                        Logging.Message("transpiled");
-                    }
+                    // Add buildingID and material params to call, restoring any original labels against the insert start.
+                    yield return new CodeInstruction(OpCodes.Ldarg_1) { labels = labels };
+                    yield return new CodeInstruction(OpCodes.Ldarg_3);
+                    instruction = new CodeInstruction(OpCodes.Call, chooseVehicle);
+                    Logging.Message("transpiled");
+                }
+
+                // If this instruction calls the GetRandomVehicle method, then replace it with a call to our custom method.
+                // Overload with additional VehicleType argument.
+                else if (instruction.Calls(getRandomVehicleType))
+                {
+                    // Add buildingID and material params to call.
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
+                    yield return new CodeInstruction(OpCodes.Ldarg_3);
+                    instruction = new CodeInstruction(OpCodes.Call, chooseVehicleType);
+                    Logging.Message("transpiled");
                 }
 
                 // Output this instruction.
                 yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Chooses a vehicle for a transfer from our custom lists (reverting to game code if no custom list exists for this building and transfer).
+        /// </summary>
+        /// <param name="buildingAI">Building AI instance.</param>
+        /// <param name="buildingID">Building ID.</param>
+        /// <param name="material">Transfer material.</param>
+        /// <returns>Vehicle prefab to spawn.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Original instance reference")]
+        public static VehicleInfo GetSelectedVehicle(BuildingAI buildingAI, ushort buildingID, TransferManager.TransferReason material)
+        {
+            // Get any custom vehicle list for this build
+            List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, material);
+            if (vehicleList == null)
+            {
+                // No custom vehicle selection - use game method.
+                return null;
+            }
+
+            // Custom vehicle selection found - randomly choose one.
+            int i = Singleton<SimulationManager>.instance.m_randomizer.Int32((uint)vehicleList.Count);
+            {
+                return vehicleList[i];
             }
         }
 
