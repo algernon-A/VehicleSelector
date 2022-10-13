@@ -27,7 +27,7 @@ namespace VehicleSelector
         /// <summary>
         /// Layout column width.
         /// </summary>
-        internal const float ColumnWidth = 210f;
+        internal const float ColumnWidth = 310f;
 
         /// <summary>
         /// Arrow button size.
