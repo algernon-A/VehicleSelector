@@ -209,6 +209,10 @@ namespace VehicleSelector
                             {
                                 vehicleList.Add(thisVehicle);
                             }
+                            else
+                            {
+                                Logging.Message("couldn't find vehicle ", vehicleName);
+                            }
                         }
                         else
                         {
