@@ -106,13 +106,15 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Handles button visibility when building info world target building changes.
+        /// Handles building info world target building changes.
         /// </summary>
         internal static void TargetChanged()
         {
-            bool isVisible = Transfers.BuildingEligibility(WorldInfoPanel.GetCurrentInstanceID().Building);
+            ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
+            bool isVisible = Transfers.BuildingEligibility(buildingID);
             s_privateBuildingButton.isVisible = isVisible;
             s_playerBuildingButton.isVisible = isVisible;
+            SetTarget(buildingID);
         }
 
         /// <summary>
