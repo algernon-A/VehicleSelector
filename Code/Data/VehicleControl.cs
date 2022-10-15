@@ -16,7 +16,7 @@ namespace VehicleSelector
     {
         // Dictionary to hold selected vehicles.
         // Key is packed ((byte)transfertype << 24) | (ushort)buildingID.
-        private static Dictionary<uint, List<VehicleInfo>> vehicles = new Dictionary<uint, List<VehicleInfo>>();
+        private static readonly Dictionary<uint, List<VehicleInfo>> AssignedVehicles = new Dictionary<uint, List<VehicleInfo>>();
 
         /// <summary>
         /// Returns the list of selected vehicles for the given building, transfer direction, and material.
@@ -30,14 +30,14 @@ namespace VehicleSelector
             if (buildingID != 0)
             {
                 // Retrieve and return any existing dictionary entry.
-                if (vehicles.TryGetValue(BuildKey(buildingID, material), out List<VehicleInfo> vehicleList))
+                if (AssignedVehicles.TryGetValue(BuildKey(buildingID, material), out List<VehicleInfo> vehicleList))
                 {
                     return vehicleList;
                 }
                 else if (material != TransferManager.TransferReason.None)
                 {
                     // No entry found; try again using the default transfer material.
-                    if (vehicles.TryGetValue(BuildKey(buildingID, TransferManager.TransferReason.None), out vehicleList))
+                    if (AssignedVehicles.TryGetValue(BuildKey(buildingID, TransferManager.TransferReason.None), out vehicleList))
                     {
                         return vehicleList;
                     }
@@ -65,17 +65,17 @@ namespace VehicleSelector
 
             // Do we have an existing entry?
             uint key = BuildKey(buildingID, material);
-            if (!vehicles.ContainsKey(key))
+            if (!AssignedVehicles.ContainsKey(key))
             {
                 // No existing entry - create one.
-                vehicles.Add(key, new List<VehicleInfo> { vehicle });
+                AssignedVehicles.Add(key, new List<VehicleInfo> { vehicle });
             }
             else
             {
                 // Existing entry - add this vehicle to the list, if it isn't already there.
-                if (!vehicles[key].Contains(vehicle))
+                if (!AssignedVehicles[key].Contains(vehicle))
                 {
-                    vehicles[key].Add(vehicle);
+                    AssignedVehicles[key].Add(vehicle);
                 }
             }
         }
@@ -97,15 +97,15 @@ namespace VehicleSelector
 
             // Do we have an existing entry?
             uint key = BuildKey(buildingID, material);
-            if (vehicles.ContainsKey(key))
+            if (AssignedVehicles.ContainsKey(key))
             {
                 // Yes - remove vehicle from list.
-                vehicles[key].Remove(vehicle);
+                AssignedVehicles[key].Remove(vehicle);
 
                 // If no vehicles remaining in this list, remove the entire entry.
-                if (vehicles[key].Count == 0)
+                if (AssignedVehicles[key].Count == 0)
                 {
-                    vehicles.Remove(key);
+                    AssignedVehicles.Remove(key);
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace VehicleSelector
         {
             // Iterate through each key in dictionary, finding any entries corresponding to the given building ID.
             List<uint> removeList = new List<uint>();
-            foreach (uint key in vehicles.Keys)
+            foreach (uint key in AssignedVehicles.Keys)
             {
                 if ((key & 0x0000FFFF) == buildingID)
                 {
@@ -129,7 +129,7 @@ namespace VehicleSelector
             // Iterate through each entry found and remove it from the dictionary.
             foreach (uint key in removeList)
             {
-                vehicles.Remove(key);
+                AssignedVehicles.Remove(key);
             }
         }
 
@@ -142,10 +142,10 @@ namespace VehicleSelector
             Logging.Message("serializing vehicle data");
 
             // Write length of dictionary.
-            writer.Write(vehicles.Count);
+            writer.Write(AssignedVehicles.Count);
 
             // Serialise each building entry.
-            foreach (KeyValuePair<uint, List<VehicleInfo>> entry in vehicles)
+            foreach (KeyValuePair<uint, List<VehicleInfo>> entry in AssignedVehicles)
             {
                 // Local reference.
                 List<VehicleInfo> vehicleList = entry.Value;
@@ -173,7 +173,7 @@ namespace VehicleSelector
             Logging.Message("deserializing vehicle data");
 
             // Clear dictionary.
-            vehicles.Clear();
+            AssignedVehicles.Clear();
 
             // Iterate through each entry read.
             int numEntries = reader.ReadInt32();
@@ -215,7 +215,7 @@ namespace VehicleSelector
                     // If at least one vehicle was recovered, add the entry to the dictionary.
                     if (vehicleList.Count > 0)
                     {
-                        vehicles.Add(key, vehicleList);
+                        AssignedVehicles.Add(key, vehicleList);
                     }
                 }
 

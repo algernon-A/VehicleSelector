@@ -18,7 +18,7 @@ namespace VehicleSelector
     internal class SelectedVehiclePanel : VehicleSelectionPanel
     {
         // Panel to display when no item is selected.
-        private UIPanel _randomPanel;
+        private readonly UIPanel _randomPanel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectedVehiclePanel"/> class.
@@ -39,7 +39,7 @@ namespace VehicleSelector
             // Label.
             UILabel randomLabel = randomSprite.AddUIComponent<UILabel>();
             randomLabel.textScale = 0.8f;
-            randomLabel.text = Translations.Translate("TFC_VEH_ANY");
+            randomLabel.text = Translations.Translate("ANY_VEHICLE");
 
             // Size is 56x33, so offset -8 from left and 3.5 from top to match normal row sizing.
             randomSprite.size = new Vector2(56f, 33f);

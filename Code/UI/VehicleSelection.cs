@@ -27,9 +27,10 @@ namespace VehicleSelector
 
         // Layout constants - private.
         private const float Margin = 5f;
-        private const float VehicleListY = 25f;
+        private const float VehicleListY = 40f;
 
         // Panel components.
+        private readonly UILabel _titleLabel;
         private readonly UIButton _addVehicleButton;
         private readonly UIButton _removeVehicleButton;
         private readonly VehicleSelectionPanel _vehicleSelectionPanel;
@@ -41,8 +42,11 @@ namespace VehicleSelector
         internal VehicleSelection()
         {
             // Set size.
-            this.height = PanelHeight;
-            this.width = BuildingPanel.PanelWidth;
+            height = PanelHeight;
+            width = BuildingPanel.PanelWidth;
+
+            // Title.
+            _titleLabel = UILabels.AddLabel(this, 0f, Margin, "Select vehicle", BuildingPanel.PanelWidth, 1f, UIHorizontalAlignment.Center);
 
             // 'Add vehicle' button.
             _addVehicleButton = UIButtons.AddIconButton(
@@ -51,7 +55,7 @@ namespace VehicleSelector
                 VehicleListY,
                 BuildingPanel.ArrowSize,
                 UITextures.LoadQuadSpriteAtlas("TC-ArrowPlus"),
-                Translations.Translate("TFC_VEH_ADD"));
+                Translations.Translate("ADD_VEHICLE_TIP"));
             _addVehicleButton.isEnabled = false;
             _addVehicleButton.eventClicked += (control, clickEvent) => AddVehicle(_vehicleSelectionPanel.SelectedVehicle);
 
@@ -62,7 +66,7 @@ namespace VehicleSelector
                 VehicleListY + BuildingPanel.ArrowSize,
                 BuildingPanel.ArrowSize,
                 UITextures.LoadQuadSpriteAtlas("TC-ArrowMinus"),
-                Translations.Translate("TFC_VEH_SUB"));
+                Translations.Translate("REMOVE_VEHICLE_TIP"));
             _removeVehicleButton.isEnabled = false;
             _removeVehicleButton.eventClicked += (control, clickEvent) => RemoveVehicle();
 
@@ -75,9 +79,9 @@ namespace VehicleSelector
             _vehicleSelectionPanel.relativePosition = new Vector2(BuildingPanel.RightColumnX, VehicleListY);
 
             // Vehicle selection panel labels.
-            UILabel vehicleSelectionLabel = UILabels.AddLabel(_vehicleSelectionPanel, 0f, -15f, Translations.Translate("TFC_VEH_AVA"), BuildingPanel.ColumnWidth, 0.8f);
+            UILabel vehicleSelectionLabel = UILabels.AddLabel(_vehicleSelectionPanel, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f);
             vehicleSelectionLabel.textAlignment = UIHorizontalAlignment.Center;
-            UILabel buildingDistrictSelectionLabel = UILabels.AddLabel(_buildingVehicleSelectionPanel, 0f, -15f, Translations.Translate("TFC_VEH_SEL"), BuildingPanel.ColumnWidth, 0.8f);
+            UILabel buildingDistrictSelectionLabel = UILabels.AddLabel(_buildingVehicleSelectionPanel, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f);
             buildingDistrictSelectionLabel.textAlignment = UIHorizontalAlignment.Center;
         }
 
@@ -100,14 +104,16 @@ namespace VehicleSelector
         /// Sets/changes the currently selected building.
         /// </summary>
         /// <param name="buildingID">New building ID.</param>
+        /// <param name="title">Selection list title string.</param>
         /// <param name="reason">Transfer reason for this vehicle selection.</param>
-        internal void SetTarget(ushort buildingID, TransferManager.TransferReason reason)
+        internal void SetTarget(ushort buildingID, string title, TransferManager.TransferReason reason)
         {
             // Ensure valid building.
             if (buildingID != 0)
             {
                 CurrentBuilding = buildingID;
                 TransferReason = reason;
+                _titleLabel.text = title;
 
                 _buildingVehicleSelectionPanel.RefreshList();
                 _vehicleSelectionPanel.RefreshList();

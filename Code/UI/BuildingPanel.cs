@@ -22,7 +22,7 @@ namespace VehicleSelector
         /// <summary>
         /// Maximum number of transfer types supported per building.
         /// </summary>
-        internal const int MaxTransfers = 4;
+        internal const int MaxTransfers = 3;
 
         /// <summary>
         /// Layout column width.
@@ -61,10 +61,8 @@ namespace VehicleSelector
         private const float AreaLabel1Y = TitleHeight + NameLabelHeight;
         private const float AreaLabel2Y = AreaLabel1Y + AreaLabelHeight;
         private const float ListY = AreaLabel2Y + AreaLabelHeight + Margin;
-        private const float SecondaryListY = ListY + VehicleSelection.PanelHeight + Margin;
+        private const float VehicleSelectionHeight = VehicleSelection.PanelHeight + Margin;
         private const float NoPanelHeight = ListY + Margin;
-        private const float OnePanelHeight = ListY + VehicleSelection.PanelHeight + Margin;
-        private const float TwoPanelHeight = SecondaryListY + VehicleSelection.PanelHeight + Margin;
 
         // Panel components.
         private readonly UILabel _buildingLabel;
@@ -73,11 +71,11 @@ namespace VehicleSelector
 
         // Sub-panels.
         private readonly Transfers.TransferStruct[] _transfers = new Transfers.TransferStruct[MaxTransfers];
-        private readonly VehicleSelection _vehicleSelection;
-        private readonly VehicleSelection _secondaryVehicleSelection;
+        private readonly VehicleSelection[] _vehicleSelections = new VehicleSelection[MaxTransfers];
 
         // Current selections.
         private ushort _currentBuilding;
+        private int _numSelections;
         private BuildingInfo _thisBuildingInfo;
 
         /// <summary>
@@ -134,16 +132,16 @@ namespace VehicleSelector
                 _areaLabel2.textAlignment = UIHorizontalAlignment.Center;
 
                 // Zoom to building button.
-                UIButton zoomButton = AddZoomButton(this, Margin, Margin, 30f, "TFC_STA_ZTB");
+                UIButton zoomButton = AddZoomButton(this, Margin, Margin, 30f, "ZOOM_BUILDING");
                 zoomButton.eventClicked += (c, p) => ZoomToBuilding(_currentBuilding);
 
                 // Add vehicle panels.
-                _vehicleSelection = this.AddUIComponent<VehicleSelection>();
-                _vehicleSelection.ParentPanel = this;
-                _vehicleSelection.relativePosition = new Vector2(0f, ListY);
-                _secondaryVehicleSelection = this.AddUIComponent<VehicleSelection>();
-                _secondaryVehicleSelection.ParentPanel = this;
-                _secondaryVehicleSelection.relativePosition = new Vector2(0f, SecondaryListY);
+                for (int i = 0; i < MaxTransfers; ++i)
+                {
+                    _vehicleSelections[i] = AddUIComponent<VehicleSelection>();
+                    _vehicleSelections[i].ParentPanel = this;
+                    _vehicleSelections[i].relativePosition = new Vector2(0f, ListY + (i * VehicleSelectionHeight));
+                }
             }
             catch (Exception e)
             {
@@ -231,30 +229,24 @@ namespace VehicleSelector
             _thisBuildingInfo = buildingManager.m_buildings.m_buffer[_currentBuilding].Info;
 
             // Maximum number of panels.
-            int numPanels = Transfers.BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
-            int vehicleReference = -1;
-
-            _vehicleSelection.Hide();
-            _secondaryVehicleSelection.Hide();
-            height = NoPanelHeight;
+            _numSelections = Transfers.BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
 
             // Set up used panels.
-            for (int i = 0; i < numPanels; ++i)
+            int i;
+            for (i = 0; i < _numSelections; ++i)
             {
-                if (vehicleReference < 0)
-                {
-                    vehicleReference = i;
-                    _vehicleSelection.SetTarget(buildingID, _transfers[i].Reason);
-                    _vehicleSelection.Show();
-                    height = OnePanelHeight;
-                }
-                else
-                {
-                    _secondaryVehicleSelection.SetTarget(buildingID, _transfers[i].Reason);
-                    _secondaryVehicleSelection.Show();
-                    height = TwoPanelHeight;
-                }
+                _vehicleSelections[i].SetTarget(buildingID, _transfers[i].Title, _transfers[i].Reason);
+                _vehicleSelections[i].Show();
             }
+
+            // Hide remaining panels.
+            while (i < MaxTransfers)
+            {
+                _vehicleSelections[i++].Hide();
+            }
+
+            // Set panel height.
+            height = NoPanelHeight + (_numSelections * VehicleSelectionHeight);
 
             // Set name.
             _buildingLabel.text = buildingManager.GetBuildingName(_currentBuilding, InstanceID.Empty);
@@ -285,7 +277,7 @@ namespace VehicleSelector
             // If no current district or park, then display no area message.
             if (currentDistrict == 0 && currentPark == 0)
             {
-                _areaLabel1.text = Translations.Translate("TFC_BLD_NOD");
+                _areaLabel1.text = Translations.Translate("NO_DISTRICT");
                 _areaLabel2.Hide();
             }
             else
@@ -319,7 +311,6 @@ namespace VehicleSelector
 
             // Make sure we're visible if we're not already.
             Show();
-
         }
     }
 }

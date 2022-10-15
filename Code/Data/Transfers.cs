@@ -31,25 +31,25 @@ namespace VehicleSelector
                     {
                         // Ambulances.
                         transfers[0].Reason = TransferManager.TransferReason.Sick;
-                        transfers[0].PanelTitle = Translations.Translate("AMBULANCE");
+                        transfers[0].Title = Translations.Translate("AMBULANCE");
                     }
                     else if (buildingInfo.m_buildingAI is HelicopterDepotAI)
                     {
                         // Medical helicopters.
                         transfers[0].Reason = TransferManager.TransferReason.Sick2;
-                        transfers[0].PanelTitle = Translations.Translate("HELI_MED");
+                        transfers[0].Title = Translations.Translate("HELI_MED");
                     }
                     else if (buildingInfo.m_buildingAI is CemeteryAI cemeteryAI)
                     {
                         // Deathcare.
                         transfers[0].Reason = TransferManager.TransferReason.Dead;
-                        transfers[0].PanelTitle = Translations.Translate("HEARSE");
+                        transfers[0].Title = Translations.Translate("HEARSE");
 
                         // Outgoing transfers - cemetaries only.
                         if (cemeteryAI.m_graveCount > 0)
                         {
                             transfers[1].Reason = TransferManager.TransferReason.DeadMove;
-                            transfers[1].PanelTitle = Translations.Translate("DEAD_TRANSFER");
+                            transfers[1].Title = Translations.Translate("DEAD_TRANSFER");
 
                             return 2;
                         }
@@ -69,13 +69,13 @@ namespace VehicleSelector
                     if (buildingInfo.m_buildingAI is HelicopterDepotAI)
                     {
                         // Fire helicopters.
-                        transfers[0].PanelTitle = Translations.Translate("HELI_FIRE");
+                        transfers[0].Title = Translations.Translate("HELI_FIRE");
                         transfers[0].Reason = TransferManager.TransferReason.Fire2;
                     }
                     else
                     {
                         // Normal firetrucks.
-                        transfers[0].PanelTitle = Translations.Translate("FIRETRUCK");
+                        transfers[0].Title = Translations.Translate("FIRETRUCK");
                         transfers[0].Reason = TransferManager.TransferReason.Fire;
                     }
 
@@ -85,7 +85,7 @@ namespace VehicleSelector
                     // Water pumping.
                     if (buildingInfo.m_buildingAI is WaterFacilityAI waterFacilityAI && buildingInfo.m_class.m_level == ItemClass.Level.Level1 && waterFacilityAI.m_pumpingVehicles > 0)
                     {
-                        transfers[0].PanelTitle = Translations.Translate("WATERPUMP");
+                        transfers[0].Title = Translations.Translate("WATERPUMP");
                         transfers[0].Reason = TransferManager.TransferReason.FloodWater;
                         return 1;
                     }
@@ -97,9 +97,9 @@ namespace VehicleSelector
                     // Disaster response - trucks and helicopters.
                     if (buildingInfo.m_buildingAI is DisasterResponseBuildingAI)
                     {
-                        transfers[0].PanelTitle = Translations.Translate("DISASTER");
+                        transfers[0].Title = Translations.Translate("DISASTER");
                         transfers[0].Reason = TransferManager.TransferReason.Collapsed;
-                        transfers[1].PanelTitle = Translations.Translate("HELI_DISASTER");
+                        transfers[1].Title = Translations.Translate("HELI_DISASTER");
                         transfers[1].Reason = TransferManager.TransferReason.Collapsed2;
                         return 2;
                     }
@@ -113,13 +113,13 @@ namespace VehicleSelector
                     // Police helicopter depot.
                     if (buildingInfo.m_buildingAI is HelicopterDepotAI)
                     {
-                        transfers[0].PanelTitle = Translations.Translate("HELI_POLICE");
+                        transfers[0].Title = Translations.Translate("HELI_POLICE");
                         transfers[0].Reason = TransferManager.TransferReason.Crime;
 
                         // Prison Helicopter Mod.
                         if ((buildingFlags & Building.Flags.Downgrading) != 0)
                         {
-                            transfers[1].PanelTitle = Translations.Translate("HELI_PRISON");
+                            transfers[1].Title = Translations.Translate("HELI_PRISON");
                             transfers[1].Reason = (TransferManager.TransferReason)121;
                             return 2;
                         }
@@ -131,7 +131,7 @@ namespace VehicleSelector
                         // Prisons.
                         if (buildingInfo.m_class.m_level >= ItemClass.Level.Level4)
                         {
-                            transfers[0].PanelTitle = Translations.Translate("PRISONVAN");
+                            transfers[0].Title = Translations.Translate("PRISONVAN");
                             transfers[0].Reason = TransferManager.TransferReason.CriminalMove;
 
                             return 1;
@@ -140,7 +140,7 @@ namespace VehicleSelector
                         {
                             // Normal police station.
                             // Police service.
-                            transfers[0].PanelTitle = Translations.Translate("POLICECAR");
+                            transfers[0].Title = Translations.Translate("POLICECAR");
                             transfers[0].Reason = TransferManager.TransferReason.Crime;
 
                             // Prison Helicopter Mod.
@@ -150,7 +150,7 @@ namespace VehicleSelector
                                 if ((buildingFlags & Building.Flags.Downgrading) != 0)
                                 {
                                     // Collect prisoners from smaller stations by sending a prison van.
-                                    transfers[1].PanelTitle = Translations.Translate("PRISONVAN");
+                                    transfers[1].Title = Translations.Translate("PRISONVAN");
                                     transfers[1].Reason = (TransferManager.TransferReason)120;
                                     return 2;
                                 }
@@ -162,7 +162,7 @@ namespace VehicleSelector
 
                 case ItemClass.Service.Industrial:
                     // Zoned industry.
-                    transfers[0].PanelTitle = Translations.Translate("CARGO_TRUCK");
+                    transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                     transfers[0].Reason = TransferManager.TransferReason.None;
                     return 1;
 
@@ -171,28 +171,28 @@ namespace VehicleSelector
                     if (buildingInfo.m_buildingAI is ExtractingFacilityAI extractingAI)
                     {
                         // Extractors.
-                        transfers[0].PanelTitle = Translations.Translate("CARGO_TRUCK");
+                        transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                         transfers[0].Reason = extractingAI.m_outputResource;
                         return 1;
                     }
                     else if (buildingInfo.m_buildingAI is ProcessingFacilityAI processingAI && buildingInfo.m_class.m_level < ItemClass.Level.Level5)
                     {
                         // Processors.
-                        transfers[0].PanelTitle = Translations.Translate("CARGO_TRUCK");
+                        transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                         transfers[0].Reason = processingAI.m_outputResource;
                         return 1;
                     }
                     else if (buildingInfo.m_buildingAI is UniqueFactoryAI)
                     {
                         // Unique factories.
-                        transfers[0].PanelTitle = Translations.Translate("CARGO_TRUCK");
+                        transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                         transfers[0].Reason = TransferManager.TransferReason.LuxuryProducts;
                         return 1;
                     }
                     else if (buildingInfo.m_buildingAI is WarehouseAI)
                     {
                         // Warehouses.
-                        transfers[0].PanelTitle = Translations.Translate("CARGO_TRUCK");
+                        transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                         transfers[0].Reason = TransferManager.TransferReason.None;
                         return 1;
                     }
@@ -204,11 +204,11 @@ namespace VehicleSelector
                     // Maintenance depots and snow dumps only, and only incoming.
                     if (buildingInfo.m_buildingAI is MaintenanceDepotAI)
                     {
-                        transfers[0].PanelTitle = Translations.Translate("ROAD_MAINT");
+                        transfers[0].Title = Translations.Translate("ROAD_MAINT");
                     }
                     else if (buildingInfo.m_buildingAI is SnowDumpAI)
                     {
-                        transfers[0].PanelTitle = Translations.Translate("ROAD_SNOW");
+                        transfers[0].Title = Translations.Translate("ROAD_SNOW");
                     }
                     else
                     {
@@ -226,32 +226,32 @@ namespace VehicleSelector
                         if (postOfficeAI.m_postVanCount > 0)
                         {
                             // Post office.
-                            transfers[0].PanelTitle = Translations.Translate("MAIL_COLLECT");
+                            transfers[0].Title = Translations.Translate("MAIL_COLLECT");
                             transfers[0].Reason = TransferManager.TransferReason.Mail;
 
                             // Post offices send unsorted mail via their trucks.
-                            transfers[1].PanelTitle = Translations.Translate("MAIL_UNSORTED");
+                            transfers[1].Title = Translations.Translate("MAIL_UNSORTED");
                             transfers[1].Reason = TransferManager.TransferReason.UnsortedMail;
 
                             // Post offices pick up sorted mail via their trucks.
-                            transfers[2].PanelTitle = Translations.Translate("MAIL_SORTED");
+                            transfers[2].Title = Translations.Translate("MAIL_SORTED");
                             transfers[2].Reason = TransferManager.TransferReason.SortedMail;
 
                             return 3;
                         }
 
                         // Mail sorting facility.
-                        transfers[0].PanelTitle = Translations.Translate("MAIL_SORTED");
+                        transfers[0].Title = Translations.Translate("MAIL_SORTED");
                         transfers[0].Reason = TransferManager.TransferReason.SortedMail;
 
-                        transfers[1].PanelTitle = Translations.Translate("MAIL_EXPORT");
+                        transfers[1].Title = Translations.Translate("MAIL_EXPORT");
                         transfers[1].Reason = TransferManager.TransferReason.OutgoingMail;
                         return 2;
                     }
                     else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportTaxi)
                     {
                         // Taxi depots.
-                        transfers[0].PanelTitle = Translations.Translate("TAXI");
+                        transfers[0].Title = Translations.Translate("TAXI");
                         transfers[0].Reason = TransferManager.TransferReason.Taxi;
                         return 1;
                     }
@@ -266,7 +266,7 @@ namespace VehicleSelector
                         if (buildingInfo.GetClassLevel() == ItemClass.Level.Level1 && landfillAI.m_electricityProduction != 0)
                         {
                             // Garbage Collection.
-                            transfers[0].PanelTitle = Translations.Translate("GARBAGE_COLLECTION");
+                            transfers[0].Title = Translations.Translate("GARBAGE_COLLECTION");
                             transfers[0].Reason = TransferManager.TransferReason.Garbage;
 
                             return 1;
@@ -276,7 +276,7 @@ namespace VehicleSelector
                         else if (buildingInfo.GetClassLevel() == ItemClass.Level.Level2 && landfillAI.m_materialProduction != 0)
                         {
                             // Garbage Collection.
-                            transfers[0].PanelTitle = Translations.Translate("GARBAGE_COLLECTION");
+                            transfers[0].Title = Translations.Translate("GARBAGE_COLLECTION");
                             transfers[0].Reason = TransferManager.TransferReason.Garbage;
 
                             return 1;
@@ -286,11 +286,11 @@ namespace VehicleSelector
                         else if (buildingInfo.GetClassLevel() == ItemClass.Level.Level1 && landfillAI.m_electricityProduction == 0)
                         {
                             // Garbage collection.
-                            transfers[0].PanelTitle = Translations.Translate("GARBAGE_COLLECTION");
+                            transfers[0].Title = Translations.Translate("GARBAGE_COLLECTION");
                             transfers[0].Reason = TransferManager.TransferReason.Garbage;
 
                             // Garbage move (emptying landfills) out.
-                            transfers[1].PanelTitle = Translations.Translate("GARBAGE_TRANSFER");
+                            transfers[1].Title = Translations.Translate("GARBAGE_TRANSFER");
                             transfers[1].Reason = TransferManager.TransferReason.GarbageMove;
 
                             return 2;
@@ -300,7 +300,7 @@ namespace VehicleSelector
                         else if (buildingInfo.GetClassLevel() == ItemClass.Level.Level3 && landfillAI.m_electricityProduction == 0)
                         {
                             // Garbage collection.
-                            transfers[0].PanelTitle = Translations.Translate("GARBAGE_COLLECTION");
+                            transfers[0].Title = Translations.Translate("GARBAGE_COLLECTION");
                             transfers[0].Reason = TransferManager.TransferReason.Garbage;
 
                             return 1;
@@ -310,7 +310,7 @@ namespace VehicleSelector
                         else if (buildingInfo.GetClassLevel() == ItemClass.Level.Level4)
                         {
                             // Garbage Transfer for proccessing from Waste Transfer Facility and Landfill Site.
-                            transfers[0].PanelTitle = Translations.Translate("GARBAGE_TRANSFER");
+                            transfers[0].Title = Translations.Translate("GARBAGE_TRANSFER");
                             transfers[0].Reason = TransferManager.TransferReason.GarbageTransfer;
 
                             return 1;
@@ -334,7 +334,7 @@ namespace VehicleSelector
             /// <summary>
             /// Title text to display for this transfer.
             /// </summary>
-            public string PanelTitle;
+            public string Title;
 
             /// <summary>
             /// Transfer reason.
