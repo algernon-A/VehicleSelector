@@ -19,14 +19,6 @@ namespace VehicleSelector
         private static Dictionary<uint, List<VehicleInfo>> vehicles = new Dictionary<uint, List<VehicleInfo>>();
 
         /// <summary>
-        /// Checks to see if the specified building has a custom vehicle selection.
-        /// </summary>
-        /// <param name="buildingID">Building ID.</param>
-        /// <param name="transferReason">Transfer reason.</param>
-        /// <returns>True if a custom record exists, false otherwise.</returns>
-        internal static bool HasRecord(ushort buildingID, TransferManager.TransferReason transferReason) => vehicles.ContainsKey(BuildKey(buildingID, transferReason));
-
-        /// <summary>
         /// Returns the list of selected vehicles for the given building, transfer direction, and material.
         /// </summary>
         /// <param name="buildingID">Building ID.</param>

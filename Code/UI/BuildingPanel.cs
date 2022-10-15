@@ -72,7 +72,7 @@ namespace VehicleSelector
         private readonly UILabel _areaLabel2;
 
         // Sub-panels.
-        private readonly TransferDataUtils.TransferStruct[] _transfers = new TransferDataUtils.TransferStruct[MaxTransfers];
+        private readonly Transfers.TransferStruct[] _transfers = new Transfers.TransferStruct[MaxTransfers];
         private readonly VehicleSelection _vehicleSelection;
         private readonly VehicleSelection _secondaryVehicleSelection;
 
@@ -231,7 +231,7 @@ namespace VehicleSelector
             _thisBuildingInfo = buildingManager.m_buildings.m_buffer[_currentBuilding].Info;
 
             // Maximum number of panels.
-            int numPanels = TransferDataUtils.BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
+            int numPanels = Transfers.BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
             int vehicleReference = -1;
 
             _vehicleSelection.Hide();
