@@ -94,10 +94,10 @@ namespace VehicleSelector
         {
             try
             {
-                s_privateBuildingButton = AddInfoPanelButton(UIView.library.Get<ZonedBuildingWorldInfoPanel>(typeof(ZonedBuildingWorldInfoPanel).Name), -97f);
-                s_playerBuildingButton = AddInfoPanelButton(UIView.library.Get<CityServiceWorldInfoPanel>(typeof(CityServiceWorldInfoPanel).Name), -72f);
-                AddInfoPanelButton(UIView.library.Get<WarehouseWorldInfoPanel>(typeof(WarehouseWorldInfoPanel).Name), -5f);
-                AddInfoPanelButton(UIView.library.Get<UniqueFactoryWorldInfoPanel>(typeof(UniqueFactoryWorldInfoPanel).Name), -5f);
+                s_privateBuildingButton = AddInfoPanelButton(UIView.library.Get<ZonedBuildingWorldInfoPanel>(typeof(ZonedBuildingWorldInfoPanel).Name));
+                s_playerBuildingButton = AddInfoPanelButton(UIView.library.Get<CityServiceWorldInfoPanel>(typeof(CityServiceWorldInfoPanel).Name));
+                AddInfoPanelButton(UIView.library.Get<WarehouseWorldInfoPanel>(typeof(WarehouseWorldInfoPanel).Name));
+                AddInfoPanelButton(UIView.library.Get<UniqueFactoryWorldInfoPanel>(typeof(UniqueFactoryWorldInfoPanel).Name));
             }
             catch (Exception e)
             {
@@ -110,7 +110,7 @@ namespace VehicleSelector
         /// </summary>
         internal static void TargetChanged()
         {
-            bool isVisible = true;// TransferDataUtils.BuildingEligibility(WorldInfoPanel.GetCurrentInstanceID().Building, new TransferDataUtils.TransferStruct[4]);
+            bool isVisible = Transfers.BuildingEligibility(WorldInfoPanel.GetCurrentInstanceID().Building);
             s_privateBuildingButton.isVisible = isVisible;
             s_playerBuildingButton.isVisible = isVisible;
         }
@@ -119,63 +119,95 @@ namespace VehicleSelector
         /// Adds a Transfer Controller button to a building info panel to directly access that building's.
         /// </summary>
         /// <param name="infoPanel">Infopanel to apply the button to.</param>
-        /// <param name="offset">Panel y-offset from default position.</param>
         /// <returns>New UIButton.</returns>
-        private static UIButton AddInfoPanelButton(BuildingWorldInfoPanel infoPanel, float offset)
+        private static UIButton AddInfoPanelButton(BuildingWorldInfoPanel infoPanel)
         {
-            const float PanelButtonSize = 24f;
-            UIButton panelButton = infoPanel.component.AddUIComponent<UIButton>();
+            const float ButtonHeight = 42f;
+            const float ButtonWidth = 42f;
 
-            // Basic button setup.
-            panelButton.atlas = UITextures.LoadSprite("TC-UUI");
-            panelButton.size = new Vector2(PanelButtonSize, PanelButtonSize);
-            panelButton.normalFgSprite = "normal";
-            panelButton.focusedFgSprite = "normal";
-            panelButton.hoveredFgSprite = "normal";
-            panelButton.pressedFgSprite = "normal";
-            panelButton.disabledFgSprite = "normal";
-            panelButton.name = "TransferControllerButton";
-            panelButton.tooltip = Translations.Translate("TFC_NAM");
+            // Targets.
+            UIComponent parent = null;
+            float relativeX = 0f;
+            float relativeY = 0f;
 
-            // Find ProblemsPanel relative position to position button.
-            // We'll use 40f as a default relative Y in case something doesn't work.
-            UIComponent problemsPanel;
-            float relativeY = 40f;
+            Logging.Message("adding info panel button  to ", infoPanel.name);
 
-            // Player info panels have wrappers, zoned ones don't.
+            // Player info panels have wrappers, warehouse and zoned ones don't.
             UIComponent wrapper = infoPanel.Find("Wrapper");
             if (wrapper == null)
             {
-                problemsPanel = infoPanel.Find("ProblemsPanel");
+                if (infoPanel.Find("ActionPanel") is UIPanel actionPanel)
+                {
+                    Logging.Message("adding info panel button to warehouse");
+
+                    // Warehouse.
+                    relativeX = 47f;
+                    parent = actionPanel;
+                }
+                else if (infoPanel.Find("Misc") is UIPanel miscPanel)
+                {
+                    Logging.Message("adding info panel button to unique factories");
+
+                    // Unique factory.
+                    relativeX = 18f;
+                    parent = miscPanel;
+                }
+                else if (infoPanel.Find("MakeHistoricalPanel") is UIPanel makeHistoricalPanel)
+                {
+                    // Zoned building.
+                    Logging.Message("adding info panel button to zoned building");
+                    relativeX = 10f;
+                    relativeY = makeHistoricalPanel.relativePosition.y - 47f;
+                    parent = infoPanel.component;
+                }
             }
             else
             {
-                problemsPanel = wrapper.Find("ProblemsPanel");
+                // City service panel.
+                relativeX = 94f;
+                parent = wrapper.Find("MainSectionPanel")?.Find("MainBottom")?.Find("ButtonPanels")?.Find("ActionButtons")?.Find("ActionPanelPanel")?.Find("ActionPanel");
             }
 
-            try
+            if (parent == null)
             {
-                // Position button vertically in the middle of the problems panel.  If wrapper panel exists, we need to add its offset as well.
-                relativeY = (wrapper == null ? 0 : wrapper.relativePosition.y) + problemsPanel.relativePosition.y + ((problemsPanel.height - PanelButtonSize) / 2);
+                Logging.Error("couldn't place panel button for ", infoPanel.name);
+                return null;
             }
-            catch
-            {
-                // Don't really care; just use default relative Y.
-                Logging.Message("couldn't find ProblemsPanel relative position");
-            }
+
+            UIButton panelButton = parent.AddUIComponent<UIButton>();
+
+            // Basic button setup.
+            panelButton.atlas = UITextures.InGameAtlas;
+            panelButton.height = ButtonHeight;
+            panelButton.width = ButtonWidth;
+            panelButton.normalFgSprite = "IconServiceVehicle";
+            panelButton.focusedFgSprite = "IconServiceVehicle";
+            panelButton.hoveredFgSprite = "IconServiceVehicle";
+            panelButton.pressedFgSprite = "IconServiceVehicle";
+            panelButton.disabledFgSprite = "IconServiceVehicle";
+            panelButton.normalBgSprite = "GenericPanelLight";
+            panelButton.focusedBgSprite = "GenericPanelLight";
+            panelButton.hoveredBgSprite = "GenericPanelWhite";
+            panelButton.pressedBgSprite = "GenericPanelLight";
+            panelButton.disabledBgSprite = "ButtonMenuDisabled";
+            panelButton.color = new Color32(219, 219, 219, 255);
+            panelButton.focusedColor = Color.white;
+            panelButton.hoveredColor = Color.white;
+            panelButton.disabledColor = new Color32(93, 84, 84, 255);
+            panelButton.name = "VehicleSelectorButton";
+            panelButton.tooltip = Translations.Translate("MOD_NAME");
 
             // Set position.
-            panelButton.AlignTo(infoPanel.component, UIAlignAnchor.TopLeft);
-            panelButton.relativePosition += new Vector3(infoPanel.component.width + offset - PanelButtonSize, relativeY, 0f);
+            panelButton.relativePosition = new Vector2(relativeX, relativeY);
 
             // Event handler.
-            panelButton.eventClick += (control, clickEvent) =>
+            panelButton.eventClick += (c, p) =>
             {
                 // Select current building in the building details panel and show.
                 SetTarget(WorldInfoPanel.GetCurrentInstanceID().Building);
 
                 // Manually unfocus control, otherwise it can stay focused until next UI event (looks untidy).
-                control.Unfocus();
+                c.Unfocus();
             };
 
             return panelButton;

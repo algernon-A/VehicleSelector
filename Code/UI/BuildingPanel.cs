@@ -13,17 +13,13 @@ namespace VehicleSelector
     using ColossalFramework;
     using ColossalFramework.UI;
     using UnityEngine;
+    using static Transfers;
 
     /// <summary>
     /// Building info panel.
     /// </summary>
     internal class BuildingPanel : UIPanel
     {
-        /// <summary>
-        /// Maximum number of transfer types supported per building.
-        /// </summary>
-        internal const int MaxTransfers = 3;
-
         /// <summary>
         /// Layout column width.
         /// </summary>
@@ -43,6 +39,7 @@ namespace VehicleSelector
         /// Right column relative X position.
         /// </summary>
         internal const float RightColumnX = MidControlX + ArrowSize + Margin;
+
         /// <summary>
         /// Panel width.
         /// </summary>
@@ -70,7 +67,7 @@ namespace VehicleSelector
         private readonly UILabel _areaLabel2;
 
         // Sub-panels.
-        private readonly Transfers.TransferStruct[] _transfers = new Transfers.TransferStruct[MaxTransfers];
+        private readonly TransferStruct[] _transfers = new TransferStruct[MaxTransfers];
         private readonly VehicleSelection[] _vehicleSelections = new VehicleSelection[MaxTransfers];
 
         // Current selections.

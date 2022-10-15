@@ -14,6 +14,18 @@ namespace VehicleSelector
     internal static class Transfers
     {
         /// <summary>
+        /// Maximum number of transfer types supported per building.
+        /// </summary>
+        internal const int MaxTransfers = 3;
+
+        /// <summary>
+        /// Checks if the given building has supported transfer types.
+        /// </summary>
+        /// <param name="buildingID">ID of building to check.</param>
+        /// <returns>True if any transfers are supported for this building, false if none.</returns>
+        internal static bool BuildingEligibility(ushort buildingID) => BuildingEligibility(buildingID, Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info, new TransferStruct[MaxTransfers]) > 0;
+
+        /// <summary>
         /// Determines the eligible transfers (if any) for the given building.
         /// Thanks to t1a2l for doing a bunch of these.
         /// </summary>
