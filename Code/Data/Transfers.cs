@@ -267,6 +267,13 @@ namespace VehicleSelector
                         transfers[0].Reason = TransferManager.TransferReason.Taxi;
                         return 1;
                     }
+                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportTrain && buildingInfo.m_class.m_level == ItemClass.Level.Level4)
+                    {
+                        // Cargo train terminals.
+                        transfers[0].Title = Translations.Translate("CARGO_TRAIN");
+                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        return 1;
+                    }
 
                     // Unsupported public transport type.
                     return 0;

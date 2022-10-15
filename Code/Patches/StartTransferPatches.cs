@@ -53,7 +53,7 @@ namespace VehicleSelector
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <param name="original">Method being transpiled.</param>
-        /// <returns>New ILCode.</returns>
+        /// <returns>Modified ILCode.</returns>
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase original)
         {
             Logging.Message("transpiling ", original.DeclaringType, ":", original.Name);
@@ -64,9 +64,9 @@ namespace VehicleSelector
             MethodInfo getSelectedVehicle = AccessTools.Method(typeof(PlayerBuildingAI), nameof(PlayerBuildingAI.GetSelectedVehicle));
 
             // Reflection to get inserted methods for calls.
-            MethodInfo chooseVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.ChooseVehicle));
-            MethodInfo chooseVehicleType = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.ChooseVehicleType));
-            MethodInfo selectVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(StartTransferPatches.GetSelectedVehicle));
+            MethodInfo chooseVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(ChooseVehicle));
+            MethodInfo chooseVehicleType = AccessTools.Method(typeof(StartTransferPatches), nameof(ChooseVehicleType));
+            MethodInfo selectVehicle = AccessTools.Method(typeof(StartTransferPatches), nameof(GetSelectedVehicle));
 
             // Instruction enumerator.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -153,7 +153,7 @@ namespace VehicleSelector
         /// <returns>Vehicle prefab to spawn.</returns>
         public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort buildingID, TransferManager.TransferReason material)
         {
-            // Get any custom vehicle list for this build
+            // Get any custom vehicle list for this building.
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, material);
             if (vehicleList == null)
             {
