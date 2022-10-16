@@ -207,7 +207,7 @@ namespace VehicleSelector
                     // Ignore any procedural vehicles (e.g. fire helicopter buckets).
                     if (vehicle.m_class.m_service == buildingService &&
                         vehicle.m_class.m_subService == buildingSubService &&
-                        (vehicle.m_class.m_level == buildingLevel || buildingService == ItemClass.Service.PlayerIndustry) &&
+                        (vehicle.m_class.m_level == buildingLevel || buildingService == ItemClass.Service.Industrial || buildingService == ItemClass.Service.PlayerIndustry) &&
                         !(vehicle.m_vehicleAI is CarTrailerAI) &&
                         !(vehicle.m_placementStyle == ItemClass.Placement.Procedural) &&
                         (selectedList == null || !selectedList.Contains(vehicle)))

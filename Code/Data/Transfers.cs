@@ -175,7 +175,25 @@ namespace VehicleSelector
                 case ItemClass.Service.Industrial:
                     // Zoned industry.
                     transfers[0].Title = Translations.Translate("CARGO_TRUCK");
-                    transfers[0].Reason = TransferManager.TransferReason.None;
+                    switch (buildingInfo.m_class.m_subService)
+                    {
+                        case ItemClass.SubService.IndustrialForestry:
+                            transfers[0].Reason = TransferManager.TransferReason.Lumber;
+                            break;
+                        case ItemClass.SubService.IndustrialFarming:
+                            transfers[0].Reason = TransferManager.TransferReason.Food;
+                            break;
+                        case ItemClass.SubService.IndustrialOil:
+                            transfers[0].Reason = TransferManager.TransferReason.Petrol;
+                            break;
+                        case ItemClass.SubService.IndustrialOre:
+                            transfers[0].Reason = TransferManager.TransferReason.Coal;
+                            break;
+                        default:
+                            transfers[0].Reason = TransferManager.TransferReason.Goods;
+                            break;
+                    }
+
                     return 1;
 
                 case ItemClass.Service.PlayerIndustry:
