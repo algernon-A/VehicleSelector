@@ -12,12 +12,19 @@ namespace VehicleSelector
     using AlgernonCommons.UI;
     using ColossalFramework;
     using ColossalFramework.UI;
+    using UnityEngine;
 
     /// <summary>
     /// Vehicle selection panel main class.
     /// </summary>
     internal class VehicleSelectionPanel : UIPanel
     {
+        /// <summary>
+        /// Preview panel.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected readonly field")]
+        protected readonly PreviewPanel m_previewPanel;
+
         // Vehicle selection list.
         private readonly UIList _vehicleList;
 
@@ -43,6 +50,10 @@ namespace VehicleSelector
                 // Vehicle selection list.
                 _vehicleList = UIList.AddUIList<VehicleSelectionRow>(this, 0f, 0f, BuildingPanel.ColumnWidth, VehicleSelection.VehicleListHeight, VehicleSelectionRow.VehicleRowHeight);
                 _vehicleList.EventSelectionChanged += (control, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
+
+                // Preview panel.
+                m_previewPanel = AddUIComponent<PreviewPanel>();
+                m_previewPanel.relativePosition = new Vector2(width + 5f, 0f);
             }
             catch (Exception e)
             {
@@ -65,6 +76,9 @@ namespace VehicleSelector
             set
             {
                 _selectedVehicle = value;
+
+                // Update preview.
+                m_previewPanel.SetTarget(value);
 
                 // Refresh parent panel button states.
                 ParentPanel.SelectionUpdated();

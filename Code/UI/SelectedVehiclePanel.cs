@@ -45,6 +45,9 @@ namespace VehicleSelector
             randomSprite.size = new Vector2(56f, 33f);
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
             randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - randomLabel.height) / 2f);
+
+            // Put preivew panel on left.
+            m_previewPanel.relativePosition = new Vector2(-(m_previewPanel.width + 5f), 0f);
         }
 
         /// <summary>
