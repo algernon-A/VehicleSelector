@@ -113,12 +113,18 @@ namespace VehicleSelector
         /// </summary>
         internal static void TargetChanged()
         {
-            ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
-            bool isVisible = Transfers.BuildingEligibility(buildingID);
-            s_privateBuildingButton.isVisible = isVisible;
-            s_playerBuildingButton.isVisible = isVisible;
+            // Don't do anything if panel isn't open.
+            if (s_panel == null)
+            {
+                return;
+            }
 
-            if (isVisible)
+            ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
+            bool supportedBuilding = Transfers.BuildingEligibility(buildingID);
+            s_privateBuildingButton.isVisible = supportedBuilding;
+            s_playerBuildingButton.isVisible = supportedBuilding;
+
+            if (supportedBuilding)
             {
                 SetTarget(buildingID);
             }
