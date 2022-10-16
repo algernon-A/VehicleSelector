@@ -201,11 +201,11 @@ namespace VehicleSelector
                         transfers[0].Reason = TransferManager.TransferReason.LuxuryProducts;
                         return 1;
                     }
-                    else if (buildingInfo.m_buildingAI is WarehouseAI)
+                    else if (buildingInfo.m_buildingAI is WarehouseAI warehouseAI)
                     {
                         // Warehouses.
                         transfers[0].Title = Translations.Translate("CARGO_TRUCK");
-                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        transfers[0].Reason = warehouseAI.GetActualTransferReason(buildingID, ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID]);
                         return 1;
                     }
 
