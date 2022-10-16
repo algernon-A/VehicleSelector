@@ -64,11 +64,14 @@ namespace VehicleSelector
         /// </summary>
         internal static void Close()
         {
-            GameObject.Destroy(s_panel);
-            GameObject.Destroy(s_gameObject);
+            if (s_panel != null)
+            {
+                GameObject.Destroy(s_panel);
+                GameObject.Destroy(s_gameObject);
 
-            s_panel = null;
-            s_gameObject = null;
+                s_panel = null;
+                s_gameObject = null;
+            }
         }
 
         /// <summary>
@@ -114,7 +117,15 @@ namespace VehicleSelector
             bool isVisible = Transfers.BuildingEligibility(buildingID);
             s_privateBuildingButton.isVisible = isVisible;
             s_playerBuildingButton.isVisible = isVisible;
-            SetTarget(buildingID);
+
+            if (isVisible)
+            {
+                SetTarget(buildingID);
+            }
+            else
+            {
+                Close();
+            }
         }
 
         /// <summary>
