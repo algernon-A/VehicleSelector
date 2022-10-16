@@ -172,9 +172,6 @@ namespace VehicleSelector
         {
             Logging.Message("deserializing vehicle data");
 
-            // Clear dictionary.
-            AssignedVehicles.Clear();
-
             // Iterate through each entry read.
             int numEntries = reader.ReadInt32();
             for (int i = 0; i < numEntries; ++i)
@@ -215,7 +212,15 @@ namespace VehicleSelector
                     // If at least one vehicle was recovered, add the entry to the dictionary.
                     if (vehicleList.Count > 0)
                     {
-                        AssignedVehicles.Add(key, vehicleList);
+                        // Check for duplicates.
+                        if (AssignedVehicles.ContainsKey(key))
+                        {
+                            Logging.Message("duplicate vehicle key ", key, "; skipping");
+                        }
+                        else
+                        {
+                            AssignedVehicles.Add(key, vehicleList);
+                        }
                     }
                 }
 
