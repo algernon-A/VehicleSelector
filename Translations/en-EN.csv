@@ -24,6 +24,8 @@
 "CARGO_TRAIN","Cargo trains","Vehicle selection title - cargo trains."
 "GARBAGE_COLLECTION","Garbage collection","Vehicle selection title - garbage collection vehicles"
 "GARBAGE_TRANSFER","Waste transfer","Vehicle selection title - garbage transfer vehicles (e.g. emptying landfills)."
+"FISH_TRUCK","Fish transport,"Vehicle selection title - fish transport trucks."
+"FISH_BOAT","Fishing boats","Vehicle selection title - fishing boats."
 "ADD_VEHICLE_TIP","Add this vehicle to the list of permitted vehicles","Tooltip for 'add vehicle' button."
 "REMOVE_VEHICLE_TIP","Remove this vehicle from the list of permitted vehicles","Tooltip for 'remove vehicle' button."
 "AVAILABLE_VEHICLES","Available vehicles","Heading."

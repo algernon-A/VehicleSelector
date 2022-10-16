@@ -357,6 +357,23 @@ namespace VehicleSelector
                     // Undefined service.
                     return 0;
 
+                case ItemClass.Service.Fishing:
+                    if (buildingInfo.m_buildingAI is FishingHarborAI)
+                    {
+                        // Fish trucks.
+                        transfers[0].Title = Translations.Translate("FISH_TRUCK");
+                        transfers[0].Reason = TransferManager.TransferReason.Fish;
+
+                        // Fishing boats.
+                        transfers[1].Title = Translations.Translate("FISH_BOAT");
+                        transfers[1].Reason = TransferManager.TransferReason.None;
+
+                        return 2;
+                    }
+
+                    // Unsupported case.
+                    return 0;
+
                 default:
                     // If not explicitly supported, then it's not supported.
                     return 0;

@@ -187,6 +187,13 @@ namespace VehicleSelector
                 // Special treatement for post offices - post vans have level 2, others level 5.
                 buildingLevel = ParentPanel.TransferReason == TransferManager.TransferReason.Mail ? ItemClass.Level.Level2 : ItemClass.Level.Level5;
             }
+            else if (buildingInfo.m_buildingAI is FishingHarborAI fishingHarborAI && ParentPanel.TransferReason == TransferManager.TransferReason.None)
+            {
+                // Fishing harbors, fishing boat selection - use boat class.
+                buildingService = fishingHarborAI.m_boatClass.m_service;
+                buildingSubService = fishingHarborAI.m_boatClass.m_subService;
+                buildingLevel = fishingHarborAI.m_boatClass.m_level;
+            }
             else if (ParentPanel.TransferReason == (TransferManager.TransferReason)120 || ParentPanel.TransferReason == (TransferManager.TransferReason)121)
             {
                 // Prison helicopter mod transfers.
@@ -202,7 +209,8 @@ namespace VehicleSelector
                 if (PrefabCollection<VehicleInfo>.GetLoaded(i) is VehicleInfo vehicle)
                 {
                     // Looking for service, sub-service and level match.
-                    // Level match is ignored if the service is PlayerIndustry, to let general Industries DLC cargo vehicles (level 0) also transfer luxury products (level 1).
+                    // Level match is ignored if the service is PlayerIndustry, to let general Industries DLC cargo vehicles (level 0) also transfer luxury products (level 1),
+                    // Level match is also ignored for zoned industry due to builing level-up.
                     // Ignore any trailer vehicles.
                     // Ignore any procedural vehicles (e.g. fire helicopter buckets).
                     if (vehicle.m_class.m_service == buildingService &&
@@ -212,6 +220,17 @@ namespace VehicleSelector
                         !(vehicle.m_placementStyle == ItemClass.Placement.Procedural) &&
                         (selectedList == null || !selectedList.Contains(vehicle)))
                     {
+                        // Special check for fishing boats, to stop fishing boats being included in fish truck lists (and vice-versa).
+                        if (buildingService == ItemClass.Service.Fishing)
+                        {
+                            bool isFishingBoat = vehicle.m_vehicleAI is FishingBoatAI;
+                            bool isFishingBoatService = ParentPanel.TransferReason == TransferManager.TransferReason.None;
+                            if (isFishingBoat != isFishingBoatService)
+                            {
+                                continue;
+                            }
+                        }
+
                         // Check vehicle type, if applicable.
                         if (buildingInfo.m_buildingAI is PlayerBuildingAI playerBuildingAI)
                         {

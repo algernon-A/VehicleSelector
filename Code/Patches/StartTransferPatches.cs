@@ -33,6 +33,8 @@ namespace VehicleSelector
             yield return typeof(PostOfficeAI).GetMethod(nameof(PostOfficeAI.StartTransfer));
             yield return typeof(LandfillSiteAI).GetMethod(nameof(LandfillSiteAI.StartTransfer));
             yield return typeof(FireStationAI).GetMethod(nameof(FireStationAI.StartTransfer));
+            yield return typeof(IndustrialBuildingAI).GetMethod(nameof(IndustrialBuildingAI.StartTransfer));
+            yield return typeof(FishingHarborAI).GetMethod(nameof(FishingHarborAI.StartTransfer));
 
             // Prison helicopter mod, if avaialble.
             MethodInfo prisonHeliAI = Type.GetType("PrisonHelicopter.AI.PrisonCopterPoliceStationAI,PrisonHelicopter", false)?.GetMethod("StartTransfer");
