@@ -306,6 +306,12 @@ namespace VehicleSelector
                 }
             }
 
+            // Make sure we're fully visible on-screen.
+            if (absolutePosition.y + height > Screen.height)
+            {
+                absolutePosition = new Vector2(absolutePosition.x, Screen.height - height);
+            }
+
             // Make sure we're visible if we're not already.
             Show();
         }
