@@ -13,17 +13,11 @@ namespace VehicleSelector
     /// </summary>
     public class PreviewPanel : UIPanel
     {
-        // Layout constants.
-        private const float Margin = 5f;
-        private const float RenderHeight = 150f;
-        private const float RenderWidth = RenderHeight;
-
         // Panel components.
         private readonly UITextureSprite _previewSprite;
         private readonly UISprite _noPreviewSprite;
         private readonly UISprite _thumbnailSprite;
         private readonly PreviewRenderer _renderer;
-        private readonly UIPanel _renderPanel;
 
         // Currently selected prefab.
         private PrefabInfo _renderPrefab;
@@ -33,39 +27,24 @@ namespace VehicleSelector
         /// </summary>
         internal PreviewPanel()
         {
-            // Size and position.
-            width = RenderWidth + (Margin * 2f);
-            height = RenderHeight + (Margin * 2f);
+            // Size.
+            width = BuildingPanel.PreviewWidth;
+            height = BuildingPanel.PreviewWidth;
 
             // Appearance.
-            backgroundSprite = "UnlockingPanel2";
             opacity = 1.0f;
 
-            // Drag bar.
-            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-            dragHandle.width = this.width;
-            dragHandle.height = this.height;
-            dragHandle.relativePosition = Vector3.zero;
-            dragHandle.target = this;
+            _previewSprite = AddUIComponent<UITextureSprite>();
+            _previewSprite.size = size;
+            _previewSprite.relativePosition = Vector2.zero;
 
-            // Preview render panel.
-            _renderPanel = AddUIComponent<UIPanel>();
-            _renderPanel.backgroundSprite = "AssetEditorItemBackgroundDisabled";
-            _renderPanel.height = RenderHeight;
-            _renderPanel.width = RenderWidth;
-            _renderPanel.relativePosition = new Vector2(Margin, Margin);
+            _noPreviewSprite = AddUIComponent<UISprite>();
+            _noPreviewSprite.size = size;
+            _noPreviewSprite.relativePosition = Vector2.zero;
 
-            _previewSprite = _renderPanel.AddUIComponent<UITextureSprite>();
-            _previewSprite.size = _renderPanel.size;
-            _previewSprite.relativePosition = Vector3.zero;
-
-            _noPreviewSprite = _renderPanel.AddUIComponent<UISprite>();
-            _noPreviewSprite.size = _renderPanel.size;
-            _noPreviewSprite.relativePosition = Vector3.zero;
-
-            _thumbnailSprite = _renderPanel.AddUIComponent<UISprite>();
-            _thumbnailSprite.size = _renderPanel.size;
-            _thumbnailSprite.relativePosition = Vector3.zero;
+            _thumbnailSprite = AddUIComponent<UISprite>();
+            _thumbnailSprite.size = size;
+            _thumbnailSprite.relativePosition = Vector2.zero;
 
             // Initialise renderer; use double size for anti-aliasing.
             _renderer = gameObject.AddComponent<PreviewRenderer>();
@@ -125,8 +104,8 @@ namespace VehicleSelector
                     _renderer.Render();
 
                     // We got a valid render; ensure preview sprite is square (decal previews can change width), set display texture, and set status flag.
-                    _previewSprite.relativePosition = Vector3.zero;
-                    _previewSprite.size = _renderPanel.size;
+                    _previewSprite.relativePosition = Vector2.zero;
+                    _previewSprite.size = size;
                     _previewSprite.texture = _renderer.Texture;
                     validRender = true;
                 }

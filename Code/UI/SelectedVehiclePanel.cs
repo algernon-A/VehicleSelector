@@ -26,9 +26,9 @@ namespace VehicleSelector
         internal SelectedVehiclePanel()
         {
             // Panel setup.
-            _randomPanel = this.AddUIComponent<UIPanel>();
-            _randomPanel.width = this.width;
-            _randomPanel.height = this.height;
+            _randomPanel = VehicleList.AddUIComponent<UIPanel>();
+            _randomPanel.width = VehicleList.width;
+            _randomPanel.height = VehicleList.height;
             _randomPanel.relativePosition = new Vector2(0f, 0f);
 
             // Random sprite.
@@ -45,10 +45,12 @@ namespace VehicleSelector
             randomSprite.size = new Vector2(56f, 33f);
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
             randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - randomLabel.height) / 2f);
-
-            // Put preivew panel on left.
-            m_previewPanel.relativePosition = new Vector2(-(m_previewPanel.width + 5f), 0f);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the preview panel should be on the left or the right.
+        /// </summary>
+        protected override bool PreviewOnLeft => true;
 
         /// <summary>
         /// Populates the list.

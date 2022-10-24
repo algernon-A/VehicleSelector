@@ -21,9 +21,19 @@ namespace VehicleSelector
     internal class BuildingPanel : UIPanel
     {
         /// <summary>
-        /// Layout column width.
+        /// Selection list column width.
         /// </summary>
-        internal const float ColumnWidth = 310f;
+        internal const float SelectionWidth = 310f;
+
+        /// <summary>
+        /// Preview column width.
+        /// </summary>
+        internal const float PreviewWidth = 150f;
+
+        /// <summary>
+        /// Panel width.
+        /// </summary>
+        internal const float ColumnWidth = Margin + SelectionWidth + Margin + PreviewWidth + Margin;
 
         /// <summary>
         /// Arrow button size.
@@ -33,7 +43,7 @@ namespace VehicleSelector
         /// <summary>
         /// Midpoint controls relative X position.
         /// </summary>
-        internal const float MidControlX = Margin + ColumnWidth + Margin;
+        internal const float MidControlX = ColumnWidth + Margin;
 
         /// <summary>
         /// Right column relative X position.
@@ -84,8 +94,7 @@ namespace VehicleSelector
             {
                 // Basic setup.
                 autoLayout = false;
-                backgroundSprite = "MenuPanel2";
-                opacity = 0.95f;
+                backgroundSprite = "UnlockingPanel2";
                 isVisible = true;
                 canFocus = true;
                 isInteractive = true;
@@ -137,7 +146,7 @@ namespace VehicleSelector
                 {
                     _vehicleSelections[i] = AddUIComponent<VehicleSelection>();
                     _vehicleSelections[i].ParentPanel = this;
-                    _vehicleSelections[i].relativePosition = new Vector2(0f, ListY + (i * VehicleSelectionHeight));
+                    _vehicleSelections[i].relativePosition = new Vector2(Margin, ListY + (i * VehicleSelectionHeight));
                 }
             }
             catch (Exception e)
@@ -307,9 +316,9 @@ namespace VehicleSelector
             }
 
             // Make sure we're fully visible on-screen.
-            if (absolutePosition.y + height > Screen.height)
+            if (absolutePosition.y + height > Screen.height - 100)
             {
-                absolutePosition = new Vector2(absolutePosition.x, Screen.height - height);
+                absolutePosition = new Vector2(absolutePosition.x, Screen.height - 100 - height);
             }
 
             // Make sure we're visible if we're not already.

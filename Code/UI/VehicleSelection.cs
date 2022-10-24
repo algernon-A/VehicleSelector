@@ -27,14 +27,14 @@ namespace VehicleSelector
 
         // Layout constants - private.
         private const float Margin = 5f;
-        private const float VehicleListY = 40f;
+        private const float VehicleListY = 45f;
 
         // Panel components.
         private readonly UILabel _titleLabel;
         private readonly UIButton _addVehicleButton;
         private readonly UIButton _removeVehicleButton;
         private readonly VehicleSelectionPanel _vehicleSelectionPanel;
-        private readonly SelectedVehiclePanel _buildingVehicleSelectionPanel;
+        private readonly SelectedVehiclePanel _selectedVehiclePanel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VehicleSelection"/> class.
@@ -43,10 +43,15 @@ namespace VehicleSelector
         {
             // Set size.
             height = PanelHeight;
-            width = BuildingPanel.PanelWidth;
+            width = BuildingPanel.PanelWidth - Margin - Margin;
+
+            // Appearance.
+            atlas = UITextures.InGameAtlas;
+            backgroundSprite = "GenericPanelLight";
+            color = new Color32(160, 160, 160, 255);
 
             // Title.
-            _titleLabel = UILabels.AddLabel(this, 0f, Margin, "Select vehicle", BuildingPanel.PanelWidth, 1f, UIHorizontalAlignment.Center);
+            _titleLabel = UILabels.AddLabel(this, 0f, 10f, "Select vehicle", BuildingPanel.PanelWidth, 1f, UIHorizontalAlignment.Center);
 
             // 'Add vehicle' button.
             _addVehicleButton = UIButtons.AddIconButton(
@@ -71,16 +76,16 @@ namespace VehicleSelector
             _removeVehicleButton.eventClicked += (control, clickEvent) => RemoveVehicle();
 
             // Vehicle selection panels.
-            _buildingVehicleSelectionPanel = this.AddUIComponent<SelectedVehiclePanel>();
-            _buildingVehicleSelectionPanel.relativePosition = new Vector2(Margin, VehicleListY);
-            _buildingVehicleSelectionPanel.ParentPanel = this;
+            _selectedVehiclePanel = this.AddUIComponent<SelectedVehiclePanel>();
+            _selectedVehiclePanel.relativePosition = new Vector2(Margin, VehicleListY);
+            _selectedVehiclePanel.ParentPanel = this;
             _vehicleSelectionPanel = this.AddUIComponent<VehicleSelectionPanel>();
             _vehicleSelectionPanel.ParentPanel = this;
             _vehicleSelectionPanel.relativePosition = new Vector2(BuildingPanel.RightColumnX, VehicleListY);
 
-            // Vehicle selection panel labels.
-            UILabels.AddLabel(_vehicleSelectionPanel, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f, UIHorizontalAlignment.Center);
-            UILabels.AddLabel(_buildingVehicleSelectionPanel, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f, UIHorizontalAlignment.Center);
+            // Vehicle selection list labels.
+            UILabels.AddLabel(_vehicleSelectionPanel.VehicleList, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.SelectionWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_selectedVehiclePanel.VehicleList, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.SelectionWidth, 0.8f, UIHorizontalAlignment.Center);
         }
 
         /// <summary>
@@ -113,7 +118,7 @@ namespace VehicleSelector
                 TransferReason = reason;
                 _titleLabel.text = title;
 
-                _buildingVehicleSelectionPanel.RefreshList();
+                _selectedVehiclePanel.RefreshList();
                 _vehicleSelectionPanel.RefreshList();
             }
         }
@@ -124,7 +129,7 @@ namespace VehicleSelector
         internal void SelectionUpdated()
         {
             _addVehicleButton.isEnabled = _vehicleSelectionPanel.SelectedVehicle != null;
-            _removeVehicleButton.isEnabled = _buildingVehicleSelectionPanel.SelectedVehicle != null;
+            _removeVehicleButton.isEnabled = _selectedVehiclePanel.SelectedVehicle != null;
         }
 
         /// <summary>
@@ -137,10 +142,10 @@ namespace VehicleSelector
             VehicleControl.AddVehicle(CurrentBuilding, TransferReason, vehicle);
 
             // Update current selection.
-            _buildingVehicleSelectionPanel.SelectedVehicle = vehicle;
+            _selectedVehiclePanel.SelectedVehicle = vehicle;
 
             // Update district lists.
-            _buildingVehicleSelectionPanel.RefreshList();
+            _selectedVehiclePanel.RefreshList();
             _vehicleSelectionPanel.RefreshList();
         }
 
@@ -151,13 +156,13 @@ namespace VehicleSelector
         private void RemoveVehicle()
         {
             // Remove selected vehicle from building.
-            VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _buildingVehicleSelectionPanel.SelectedVehicle);
+            VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _selectedVehiclePanel.SelectedVehicle);
 
             // Clear current selection.
-            _buildingVehicleSelectionPanel.SelectedVehicle = null;
+            _selectedVehiclePanel.SelectedVehicle = null;
 
             // Update vehicle lists.
-            _buildingVehicleSelectionPanel.RefreshList();
+            _selectedVehiclePanel.RefreshList();
             _vehicleSelectionPanel.RefreshList();
         }
     }

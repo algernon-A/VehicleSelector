@@ -20,6 +20,11 @@ namespace VehicleSelector
     internal class VehicleSelectionPanel : UIPanel
     {
         /// <summary>
+        /// Layout margin.
+        /// </summary>
+        protected const float Margin = 5f;
+
+        /// <summary>
         /// Preview panel.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected readonly field")]
@@ -48,12 +53,18 @@ namespace VehicleSelector
                 height = VehicleSelection.VehicleListHeight;
 
                 // Vehicle selection list.
-                _vehicleList = UIList.AddUIList<VehicleSelectionRow>(this, 0f, 0f, BuildingPanel.ColumnWidth, VehicleSelection.VehicleListHeight, VehicleSelectionRow.VehicleRowHeight);
+                _vehicleList = UIList.AddUIList<VehicleSelectionRow>(
+                    this,
+                    PreviewOnLeft ? Margin + BuildingPanel.PreviewWidth : 0f,
+                    0f,
+                    BuildingPanel.SelectionWidth,
+                    VehicleSelection.VehicleListHeight,
+                    VehicleSelectionRow.VehicleRowHeight);
                 _vehicleList.EventSelectionChanged += (control, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
 
                 // Preview panel.
                 m_previewPanel = AddUIComponent<PreviewPanel>();
-                m_previewPanel.relativePosition = new Vector2(width + 5f, 0f);
+                m_previewPanel.relativePosition = new Vector2(PreviewOnLeft ? 0f : BuildingPanel.SelectionWidth + Margin, 0f);
             }
             catch (Exception e)
             {
@@ -84,6 +95,12 @@ namespace VehicleSelector
                 ParentPanel.SelectionUpdated();
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the preview panel should be on the left or the right.
+        /// </summary>
+        protected virtual bool PreviewOnLeft => false;
+
 
         /// <summary>
         /// Gets the vehicle selection list.
