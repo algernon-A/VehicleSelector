@@ -5,19 +5,38 @@
 
 namespace VehicleSelector
 {
+    using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
+    using UnityEngine;
 
     /// <summary>
     /// The mod's settings options panel.
     /// </summary>
     public class OptionsPanel : UIPanel
     {
+        // Layout constants.
+        private const float Margin = 5f;
+        private const float LeftMargin = 24f;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionsPanel"/> class.
         /// </summary>
         internal OptionsPanel()
         {
+            // Add controls.
+            // Y position indicator.
+            float currentY = Margin;
+
+            // Language choice.
+            UIDropDown languageDropDown = UIDropDowns.AddPlainDropDown(this, LeftMargin, currentY, Translations.Translate("LANGUAGE_CHOICE"), Translations.LanguageList, Translations.Index);
+            languageDropDown.eventSelectedIndexChanged += (control, index) =>
+            {
+                Translations.Index = index;
+                OptionsPanelManager<OptionsPanel>.LocaleChanged();
+            };
+            languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += languageDropDown.parent.height + Margin;
         }
     }
 }
