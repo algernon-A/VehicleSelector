@@ -79,10 +79,8 @@ namespace VehicleSelector
             _vehicleSelectionPanel.relativePosition = new Vector2(BuildingPanel.RightColumnX, VehicleListY);
 
             // Vehicle selection panel labels.
-            UILabel vehicleSelectionLabel = UILabels.AddLabel(_vehicleSelectionPanel, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f);
-            vehicleSelectionLabel.textAlignment = UIHorizontalAlignment.Center;
-            UILabel buildingDistrictSelectionLabel = UILabels.AddLabel(_buildingVehicleSelectionPanel, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f);
-            buildingDistrictSelectionLabel.textAlignment = UIHorizontalAlignment.Center;
+            UILabels.AddLabel(_vehicleSelectionPanel, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_buildingVehicleSelectionPanel, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.ColumnWidth, 0.8f, UIHorizontalAlignment.Center);
         }
 
         /// <summary>
