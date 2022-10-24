@@ -316,9 +316,9 @@ namespace VehicleSelector
             }
 
             // Make sure we're fully visible on-screen.
-            if (absolutePosition.y + height > Screen.height - 100)
+            if (absolutePosition.y + height > Screen.height - 120)
             {
-                absolutePosition = new Vector2(absolutePosition.x, Screen.height - 100 - height);
+                absolutePosition = new Vector2(absolutePosition.x, Screen.height - 120 - height);
             }
 
             // Make sure we're visible if we're not already.
