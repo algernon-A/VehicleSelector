@@ -85,6 +85,10 @@ namespace VehicleSelector
         private int _numSelections;
         private BuildingInfo _thisBuildingInfo;
 
+        // Event handling.
+        private bool _copyProcessing = false;
+        private bool _pasteProcessing = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BuildingPanel"/> class.
         /// </summary>
@@ -169,6 +173,51 @@ namespace VehicleSelector
         /// Gets or sets the current transfer reason.
         /// </summary>
         internal TransferManager.TransferReason TransferReason { get; set; }
+
+        /// <summary>
+        /// Called by Unity every update.
+        /// Used to check for copy/paste keypress.
+        /// </summary>
+        public override void Update()
+        {
+            // Copy key processing - use event flag to avoid repeated triggering.
+            if (ModSettings.KeyCopy.IsPressed())
+            {
+                if (!_copyProcessing)
+                {
+                    CopyPaste.Copy(CurrentBuilding);
+                    _copyProcessing = true;
+                }
+            }
+            else
+            {
+                // Key no longer down - resume processing of events.
+                _copyProcessing = false;
+            }
+
+            // Paste key processing - use event flag to avoid repeated triggering.
+            if (ModSettings.KeyPaste.IsPressed())
+            {
+                if (!_pasteProcessing)
+                {
+                    CopyPaste.Paste(CurrentBuilding);
+                    _pasteProcessing = true;
+
+                    // Update lists.
+                    foreach (VehicleSelection vehicleSelection in _vehicleSelections)
+                    {
+                        vehicleSelection.Refresh();
+                    }
+                }
+            }
+            else
+            {
+                // Key no longer down - resume processing of events.
+                _pasteProcessing = false;
+            }
+
+            base.Update();
+        }
 
         /// <summary>
         /// Adds an zoom icon button.

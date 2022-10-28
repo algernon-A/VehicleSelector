@@ -84,7 +84,7 @@ namespace VehicleSelector
         /// Removes a vehicle from list of selected vehicles for the given building, transfer direction, and material.
         /// </summary>
         /// <param name="buildingID">Building ID.</param>
-        /// <param name="material">Transfer material.</param>
+        /// <param name="material">Transfer reason.</param>
         /// <param name="vehicle">Vehicle prefab to remove.</param>
         internal static void RemoveVehicle(ushort buildingID, TransferManager.TransferReason material, VehicleInfo vehicle)
         {
@@ -108,6 +108,38 @@ namespace VehicleSelector
                     AssignedVehicles.Remove(key);
                 }
             }
+        }
+
+        /// <summary>
+        /// Pastes the given list of vehicles to the specified building and reason (overwriting any existing entries).
+        /// </summary>
+        /// <param name="buildingID">Building ID.</param>
+        /// <param name="material">Transfer reason.</param>
+        /// <param name="vehicles">Vehicle list to paste.</param>
+        internal static void PasteVehicles(ushort buildingID, TransferManager.TransferReason material, List<VehicleInfo> vehicles)
+        {
+            // Safety checks.
+            if (buildingID == 0)
+            {
+                Logging.Error("invalid buildingID passed to VehicleControl.ClearVehicles");
+                return;
+            }
+
+            // Do we have an existing entry?
+            uint key = BuildKey(buildingID, material);
+            if (AssignedVehicles.ContainsKey(key))
+            {
+                // Yes - clear list.
+                AssignedVehicles[key].Clear();
+            }
+            else
+            {
+                // No - add new entry.
+                AssignedVehicles.Add(key, new List<VehicleInfo>());
+            }
+
+            // Copy from list of provided vehicles (copying content, not the list reference itself).
+            AssignedVehicles[key].AddRange(vehicles);
         }
 
         /// <summary>

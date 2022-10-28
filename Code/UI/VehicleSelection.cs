@@ -118,9 +118,17 @@ namespace VehicleSelector
                 TransferReason = reason;
                 _titleLabel.text = title;
 
-                _selectedVehiclePanel.RefreshList();
-                _vehicleSelectionPanel.RefreshList();
+                Refresh();
             }
+        }
+
+        /// <summary>
+        /// Refreshes list contents.
+        /// </summary>
+        internal void Refresh()
+        {
+            _selectedVehiclePanel.RefreshList();
+            _vehicleSelectionPanel.RefreshList();
         }
 
         /// <summary>
