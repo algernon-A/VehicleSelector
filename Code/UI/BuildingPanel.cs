@@ -70,11 +70,19 @@ namespace VehicleSelector
         private const float ListY = AreaLabel2Y + AreaLabelHeight + Margin;
         private const float VehicleSelectionHeight = VehicleSelection.PanelHeight + Margin;
         private const float NoPanelHeight = ListY + Margin;
+        private const float IconButtonSize = 40f;
+        private const float IconButtonY = TitleHeight + Margin;
+        private const float PasteButtonX = PanelWidth - IconButtonSize - Margin;
+        private const float CopyButtonX = PasteButtonX - IconButtonSize - Margin;
 
         // Panel components.
         private readonly UILabel _buildingLabel;
         private readonly UILabel _areaLabel1;
         private readonly UILabel _areaLabel2;
+        private readonly UIButton _copyButton;
+        private readonly UIButton _pasteButton;
+        private readonly UIButton _copyBuildingButton;
+        private readonly UIButton _copyDistrictButton;
 
         // Sub-panels.
         private readonly TransferStruct[] _transfers = new TransferStruct[MaxTransfers];
@@ -145,6 +153,12 @@ namespace VehicleSelector
                 UIButton zoomButton = AddZoomButton(this, Margin, Margin, 30f, "ZOOM_BUILDING");
                 zoomButton.eventClicked += (c, p) => ZoomToBuilding(_currentBuilding);
 
+                // Copy/paste buttons.
+                _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VC-Copy"));
+                _copyButton.eventClicked += (c, p) => CopyPaste.Copy(CurrentBuilding);
+                _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VC-Paste"));
+                _pasteButton.eventClicked += (c, p) => Paste();
+
                 // Add vehicle panels.
                 for (int i = 0; i < MaxTransfers; ++i)
                 {
@@ -187,6 +201,9 @@ namespace VehicleSelector
                 {
                     CopyPaste.Copy(CurrentBuilding);
                     _copyProcessing = true;
+
+                    // Update paste button state.
+                    _pasteButton.isEnabled = CopyPaste.IsValidTarget(CurrentBuilding);
                 }
             }
             else
@@ -200,14 +217,8 @@ namespace VehicleSelector
             {
                 if (!_pasteProcessing)
                 {
-                    CopyPaste.Paste(CurrentBuilding);
+                    Paste();
                     _pasteProcessing = true;
-
-                    // Update lists.
-                    foreach (VehicleSelection vehicleSelection in _vehicleSelections)
-                    {
-                        vehicleSelection.Refresh();
-                    }
                 }
             }
             else
@@ -370,8 +381,26 @@ namespace VehicleSelector
                 absolutePosition = new Vector2(absolutePosition.x, Screen.height - 120 - height);
             }
 
+            // Update paste button state.
+            _pasteButton.isEnabled = CopyPaste.IsValidTarget(CurrentBuilding);
+
             // Make sure we're visible if we're not already.
             Show();
+        }
+
+        /// <summary>
+        /// Paste data action.
+        /// </summary>
+        private void Paste()
+        {
+            // Paste data.
+            CopyPaste.Paste(CurrentBuilding);
+
+            // Update lists.
+            foreach (VehicleSelection vehicleSelection in _vehicleSelections)
+            {
+                vehicleSelection.Refresh();
+            }
         }
     }
 }

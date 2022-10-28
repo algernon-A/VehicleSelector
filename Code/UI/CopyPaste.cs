@@ -37,8 +37,6 @@ namespace VehicleSelector
         /// <param name="buildingID">Source building ID.</param>
         internal static void Copy(ushort buildingID)
         {
-            Logging.Message("copying from building ", buildingID);
-
             // Safetey check.
             if (buildingID == 0)
             {
@@ -83,6 +81,42 @@ namespace VehicleSelector
         }
 
         /// <summary>
+        /// Checks if the given building is a valid target for the current copy buffer..
+        /// </summary>
+        /// <param name="buildingID">Source building ID.</param>
+        /// <returns>True the building is a valid copy buffer target, false otherwise.</returns>
+        internal static bool IsValidTarget(ushort buildingID)
+        {
+            // Don't do anything if there's no active copy data.
+            if (!s_isCopied || buildingID == 0)
+            {
+                return false;
+            }
+
+            BuildingInfo buildingInfo = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info;
+            if (buildingInfo == null)
+            {
+                return false;
+            }
+
+            // Determine length of target building transfer buffer (smallest of the two buffers).
+            int length = Mathf.Min(s_bufferSize, Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer));
+
+            // Check buffer content variability.
+            for (int i = 0; i < length; ++i)
+            {
+                // Check for a matching reason.
+                if (TransferBuffer[i].Reason == CopyReasons[i])
+                {
+                    return true;
+                }
+            }
+
+            // If we got here, no match was found.
+            return false;
+        }
+
+        /// <summary>
         /// Attempts to paste vehicle data from the copy buffer to the given building.
         /// </summary>
         /// <param name="buildingID">Source building ID.</param>
@@ -94,8 +128,6 @@ namespace VehicleSelector
             {
                 return false;
             }
-
-            Logging.Message("pasting to building ", buildingID);
 
             // Safetey check.
             if (buildingID == 0)
