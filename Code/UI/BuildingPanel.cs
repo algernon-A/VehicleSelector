@@ -154,9 +154,9 @@ namespace VehicleSelector
                 zoomButton.eventClicked += (c, p) => ZoomToBuilding(_currentBuilding);
 
                 // Copy/paste buttons.
-                _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VC-Copy"));
+                _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Copy"));
                 _copyButton.eventClicked += (c, p) => CopyPaste.Copy(CurrentBuilding);
-                _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VC-Paste"));
+                _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Paste"));
                 _pasteButton.eventClicked += (c, p) => Paste();
 
                 // Add vehicle panels.

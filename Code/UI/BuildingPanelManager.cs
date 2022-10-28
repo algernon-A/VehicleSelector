@@ -197,11 +197,6 @@ namespace VehicleSelector
             panelButton.atlas = UITextures.InGameAtlas;
             panelButton.height = ButtonHeight;
             panelButton.width = ButtonWidth;
-            panelButton.normalFgSprite = "IconServiceVehicle";
-            panelButton.focusedFgSprite = "IconServiceVehicle";
-            panelButton.hoveredFgSprite = "IconServiceVehicle";
-            panelButton.pressedFgSprite = "IconServiceVehicle";
-            panelButton.disabledFgSprite = "IconServiceVehicle";
             panelButton.normalBgSprite = "GenericPanelLight";
             panelButton.focusedBgSprite = "GenericPanelLight";
             panelButton.hoveredBgSprite = "GenericPanelWhite";
@@ -213,6 +208,14 @@ namespace VehicleSelector
             panelButton.disabledColor = new Color32(93, 84, 84, 255);
             panelButton.name = "VehicleSelectorButton";
             panelButton.tooltip = Translations.Translate("MOD_NAME");
+
+
+            UISprite buttonSprite = panelButton.AddUIComponent<UISprite>();
+            buttonSprite.size = panelButton.size;
+            buttonSprite.atlas = UITextures.LoadSingleSpriteAtlas("VS-Icon");
+            buttonSprite.relativePosition = new Vector2(1f, 1f);
+            buttonSprite.spriteName = "normal";
+
 
             // Set position.
             panelButton.relativePosition = new Vector2(relativeX, relativeY);
