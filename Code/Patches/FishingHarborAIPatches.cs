@@ -72,7 +72,7 @@ namespace VehicleSelector
         /// <returns>Vehicle prefab to spawn.</returns>
         public static VehicleInfo ChooseVehicleType(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type, ushort buildingID)
         {
-            // Get any custom vehicle list for this build
+            // Get any custom vehicle list for this building.
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, TransferManager.TransferReason.None);
             if (vehicleList == null)
             {

@@ -374,7 +374,7 @@ namespace VehicleSelector
                 case ItemClass.Service.Fishing:
                     if (buildingInfo.m_buildingAI is FishingHarborAI)
                     {
-                        // Fish trucks.
+                        // Fishing harbours - cargo trucks and fishing boats.
                         transfers[0].Title = Translations.Translate("FISH_TRUCK");
                         transfers[0].Reason = TransferManager.TransferReason.Fish;
 
@@ -383,6 +383,24 @@ namespace VehicleSelector
                         transfers[1].Reason = TransferManager.TransferReason.None;
 
                         return 2;
+                    }
+
+                    if (buildingInfo.m_buildingAI is FishFarmAI)
+                    {
+                        // Seaweed farms etc. - no boats.
+                        transfers[0].Title = Translations.Translate("FISH_TRUCK");
+                        transfers[0].Reason = TransferManager.TransferReason.Fish;
+
+                        return 1;
+                    }
+
+                    if (buildingInfo.m_buildingAI is ProcessingFacilityAI)
+                    {
+                        // Fish factory.
+                        transfers[0].Title = Translations.Translate("CARGO_TRUCK");
+                        transfers[0].Reason = TransferManager.TransferReason.Goods;
+
+                        return 1;
                     }
 
                     // Unsupported case.

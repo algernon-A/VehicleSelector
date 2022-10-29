@@ -182,6 +182,15 @@ namespace VehicleSelector
                     case TransferManager.TransferReason.LuxuryProducts:
                         buildingService = ItemClass.Service.PlayerIndustry;
                         break;
+
+                    // Fish warehousing.
+                    case TransferManager.TransferReason.Fish:
+                        if (buildingInfo.m_buildingAI is WarehouseAI)
+                        {
+                            buildingService = ItemClass.Service.Fishing;
+                        }
+
+                        break;
                 }
             }
             else if (buildingSubService == ItemClass.SubService.PublicTransportPost)
@@ -189,12 +198,26 @@ namespace VehicleSelector
                 // Special treatement for post offices - post vans have level 2, others level 5.
                 buildingLevel = ParentPanel.TransferReason == TransferManager.TransferReason.Mail ? ItemClass.Level.Level2 : ItemClass.Level.Level5;
             }
-            else if (buildingInfo.m_buildingAI is FishingHarborAI fishingHarborAI && ParentPanel.TransferReason == TransferManager.TransferReason.None)
+            else if (buildingService == ItemClass.Service.Fishing)
             {
-                // Fishing harbors, fishing boat selection - use boat class.
-                buildingService = fishingHarborAI.m_boatClass.m_service;
-                buildingSubService = fishingHarborAI.m_boatClass.m_subService;
-                buildingLevel = fishingHarborAI.m_boatClass.m_level;
+                if (ParentPanel.TransferReason == TransferManager.TransferReason.None && buildingInfo.m_buildingAI is FishingHarborAI fishingHarborAI)
+                {
+                    // Fishing harbors, fishing boat selection - use boat class.
+                    buildingService = fishingHarborAI.m_boatClass.m_service;
+                    buildingSubService = fishingHarborAI.m_boatClass.m_subService;
+                    buildingLevel = fishingHarborAI.m_boatClass.m_level;
+                }
+                else if (buildingInfo.m_buildingAI is FishFarmAI)
+                {
+                    // Set fish farm AI to level 1 for fish trucks.
+                    buildingLevel = ItemClass.Level.Level1;
+                }
+                else if (buildingInfo.m_buildingAI is ProcessingFacilityAI)
+                {
+                    // Fish factories.
+                    buildingService = ItemClass.Service.Industrial;
+                    buildingSubService = ItemClass.SubService.IndustrialGeneric;
+                }
             }
             else if (ParentPanel.TransferReason == (TransferManager.TransferReason)120 || ParentPanel.TransferReason == (TransferManager.TransferReason)121)
             {
