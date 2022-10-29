@@ -28,8 +28,8 @@ namespace VehicleSelector
         internal PreviewPanel()
         {
             // Size.
-            width = BuildingPanel.PreviewWidth;
-            height = BuildingPanel.PreviewWidth;
+            width = VehicleSelection.PreviewWidth;
+            height = VehicleSelection.PreviewWidth;
 
             // Appearance.
             opacity = 1.0f;

@@ -20,40 +20,6 @@ namespace VehicleSelector
     /// </summary>
     internal class BuildingPanel : UIPanel
     {
-        /// <summary>
-        /// Selection list column width.
-        /// </summary>
-        internal const float SelectionWidth = 310f;
-
-        /// <summary>
-        /// Preview column width.
-        /// </summary>
-        internal const float PreviewWidth = 150f;
-
-        /// <summary>
-        /// Panel width.
-        /// </summary>
-        internal const float ColumnWidth = Margin + SelectionWidth + Margin + PreviewWidth + Margin;
-
-        /// <summary>
-        /// Arrow button size.
-        /// </summary>
-        internal const float ArrowSize = 32f;
-
-        /// <summary>
-        /// Midpoint controls relative X position.
-        /// </summary>
-        internal const float MidControlX = ColumnWidth + Margin;
-
-        /// <summary>
-        /// Right column relative X position.
-        /// </summary>
-        internal const float RightColumnX = MidControlX + ArrowSize + Margin;
-
-        /// <summary>
-        /// Panel width.
-        /// </summary>
-        internal const float PanelWidth = RightColumnX + ColumnWidth + Margin;
 
         /// <summary>
         /// Layout margin.
@@ -74,6 +40,7 @@ namespace VehicleSelector
         private const float IconButtonY = TitleHeight + Margin;
         private const float PasteButtonX = PanelWidth - IconButtonSize - Margin;
         private const float CopyButtonX = PasteButtonX - IconButtonSize - Margin;
+        private const float PanelWidth = VehicleSelection.PanelWidth + Margin + Margin;
 
         // Panel components.
         private readonly UILabel _buildingLabel;

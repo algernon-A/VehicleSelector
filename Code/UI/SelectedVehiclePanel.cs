@@ -47,10 +47,12 @@ namespace VehicleSelector
             randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - randomLabel.height) / 2f);
         }
 
+
+
         /// <summary>
-        /// Gets a value indicating whether the preview panel should be on the left or the right.
+        /// Sets the currently selected vehicle.
         /// </summary>
-        protected override bool PreviewOnLeft => true;
+        protected override VehicleInfo SelectedVehicle { set => ParentPanel.SelectedBuildingVehicle = value; }
 
         /// <summary>
         /// Populates the list.

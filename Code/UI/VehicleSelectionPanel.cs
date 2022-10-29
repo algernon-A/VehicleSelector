@@ -12,7 +12,6 @@ namespace VehicleSelector
     using AlgernonCommons.UI;
     using ColossalFramework;
     using ColossalFramework.UI;
-    using UnityEngine;
 
     /// <summary>
     /// Vehicle selection panel main class.
@@ -24,17 +23,8 @@ namespace VehicleSelector
         /// </summary>
         protected const float Margin = 5f;
 
-        /// <summary>
-        /// Preview panel.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected readonly field")]
-        protected readonly PreviewPanel m_previewPanel;
-
         // Vehicle selection list.
         private readonly UIList _vehicleList;
-
-        // Currently selected vehicle.
-        private VehicleInfo _selectedVehicle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VehicleSelectionPanel"/> class.
@@ -49,22 +39,18 @@ namespace VehicleSelector
                 isVisible = true;
                 canFocus = true;
                 isInteractive = true;
-                width = BuildingPanel.ColumnWidth;
+                width = VehicleSelection.ListWidth;
                 height = VehicleSelection.VehicleListHeight;
 
                 // Vehicle selection list.
                 _vehicleList = UIList.AddUIList<VehicleSelectionRow>(
                     this,
-                    PreviewOnLeft ? Margin + BuildingPanel.PreviewWidth : 0f,
                     0f,
-                    BuildingPanel.SelectionWidth,
+                    0f,
+                    VehicleSelection.ListWidth,
                     VehicleSelection.VehicleListHeight,
                     VehicleSelectionRow.VehicleRowHeight);
-                _vehicleList.EventSelectionChanged += (control, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
-
-                // Preview panel.
-                m_previewPanel = AddUIComponent<PreviewPanel>();
-                m_previewPanel.relativePosition = new Vector2(PreviewOnLeft ? 0f : BuildingPanel.SelectionWidth + Margin, 0f);
+                _vehicleList.EventSelectionChanged += (c, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
             }
             catch (Exception e)
             {
@@ -78,34 +64,19 @@ namespace VehicleSelector
         internal VehicleSelection ParentPanel { get; set; }
 
         /// <summary>
-        /// Gets or sets the currently selected vehicle.
-        /// </summary>
-        internal VehicleInfo SelectedVehicle
-        {
-            get => _selectedVehicle;
-
-            set
-            {
-                _selectedVehicle = value;
-
-                // Update preview.
-                m_previewPanel.SetTarget(value);
-
-                // Refresh parent panel button states.
-                ParentPanel.SelectionUpdated();
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the preview panel should be on the left or the right.
-        /// </summary>
-        protected virtual bool PreviewOnLeft => false;
-
-
-        /// <summary>
         /// Gets the vehicle selection list.
         /// </summary>
-        protected internal UIList VehicleList => _vehicleList;
+        internal UIList VehicleList => _vehicleList;
+
+        /// <summary>
+        /// Sets the currently selected vehicle.
+        /// </summary>
+        protected virtual VehicleInfo SelectedVehicle { set => ParentPanel.SelectedListVehicle = value; }
+
+        /// <summary>
+        /// Clears the current selection.
+        /// </summary>
+        internal void ClearSelection() => _vehicleList.SelectedIndex = -1;
 
         /// <summary>
         /// Refreshes the list with current information.

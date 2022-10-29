@@ -23,11 +23,29 @@ namespace VehicleSelector
         /// <summary>
         /// List height.
         /// </summary>
-        internal const float VehicleListHeight = 240f;
+        internal const float VehicleListHeight = 200f;
+
+        /// <summary>
+        /// Selection list column width.
+        /// </summary>
+        internal const float ListWidth = 310f;
+
+        /// <summary>
+        /// Preview column width.
+        /// </summary>
+        internal const float PreviewWidth = 150f;
+
+        /// <summary>
+        /// Panel width.
+        /// </summary>
+        internal const float PanelWidth = RightColumnX + ListWidth + Margin;
 
         // Layout constants - private.
         private const float Margin = 5f;
         private const float VehicleListY = 45f;
+        private const float ArrowSize = 32f;
+        private const float MidControlX = Margin + ListWidth + Margin;
+        private const float RightColumnX = MidControlX + PreviewWidth + Margin;
 
         // Panel components.
         private readonly UILabel _titleLabel;
@@ -35,6 +53,11 @@ namespace VehicleSelector
         private readonly UIButton _removeVehicleButton;
         private readonly VehicleSelectionPanel _vehicleSelectionPanel;
         private readonly SelectedVehiclePanel _selectedVehiclePanel;
+        private readonly PreviewPanel _previewPanel;
+
+        // Currently selected vehicles.
+        private VehicleInfo _selectedBuildingVehicle;
+        private VehicleInfo _selectedListVehicle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VehicleSelection"/> class.
@@ -43,7 +66,7 @@ namespace VehicleSelector
         {
             // Set size.
             height = PanelHeight;
-            width = BuildingPanel.PanelWidth - Margin - Margin;
+            width = PanelWidth;
 
             // Appearance.
             atlas = UITextures.InGameAtlas;
@@ -51,25 +74,25 @@ namespace VehicleSelector
             color = new Color32(160, 160, 160, 255);
 
             // Title.
-            _titleLabel = UILabels.AddLabel(this, 0f, 10f, "Select vehicle", BuildingPanel.PanelWidth, 1f, UIHorizontalAlignment.Center);
+            _titleLabel = UILabels.AddLabel(this, 0f, 10f, "Select vehicle", PanelWidth, 1f, UIHorizontalAlignment.Center);
 
             // 'Add vehicle' button.
             _addVehicleButton = UIButtons.AddIconButton(
                 this,
-                BuildingPanel.MidControlX,
+                RightColumnX - ArrowSize - Margin,
                 VehicleListY,
-                BuildingPanel.ArrowSize,
+                ArrowSize,
                 UITextures.LoadQuadSpriteAtlas("TC-ArrowPlus"),
                 Translations.Translate("ADD_VEHICLE_TIP"));
             _addVehicleButton.isEnabled = false;
-            _addVehicleButton.eventClicked += (control, clickEvent) => AddVehicle(_vehicleSelectionPanel.SelectedVehicle);
+            _addVehicleButton.eventClicked += (control, clickEvent) => AddVehicle(_selectedListVehicle);
 
             // Remove vehicle button.
             _removeVehicleButton = UIButtons.AddIconButton(
                 this,
-                BuildingPanel.MidControlX,
-                VehicleListY + BuildingPanel.ArrowSize,
-                BuildingPanel.ArrowSize,
+                MidControlX,
+                VehicleListY,
+                ArrowSize,
                 UITextures.LoadQuadSpriteAtlas("TC-ArrowMinus"),
                 Translations.Translate("REMOVE_VEHICLE_TIP"));
             _removeVehicleButton.isEnabled = false;
@@ -81,11 +104,67 @@ namespace VehicleSelector
             _selectedVehiclePanel.ParentPanel = this;
             _vehicleSelectionPanel = this.AddUIComponent<VehicleSelectionPanel>();
             _vehicleSelectionPanel.ParentPanel = this;
-            _vehicleSelectionPanel.relativePosition = new Vector2(BuildingPanel.RightColumnX, VehicleListY);
+            _vehicleSelectionPanel.relativePosition = new Vector2(RightColumnX, VehicleListY);
 
             // Vehicle selection list labels.
-            UILabels.AddLabel(_vehicleSelectionPanel.VehicleList, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), BuildingPanel.SelectionWidth, 0.8f, UIHorizontalAlignment.Center);
-            UILabels.AddLabel(_selectedVehiclePanel.VehicleList, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), BuildingPanel.SelectionWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_vehicleSelectionPanel.VehicleList, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_selectedVehiclePanel.VehicleList, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+
+            // Preview panel.
+            _previewPanel = AddUIComponent<PreviewPanel>();
+            _previewPanel.relativePosition = new Vector2(MidControlX, VehicleListY + ArrowSize + Margin);
+        }
+
+        /// <summary>
+        /// Sets the currently selected vehicle from the list of currently selected vehicles.
+        /// </summary>
+        internal VehicleInfo SelectedBuildingVehicle
+        {
+            set
+            {
+                _selectedBuildingVehicle = value;
+
+                if (value != null)
+                {
+                    // Clear other vehicle list selection if this is active.
+                    _vehicleSelectionPanel.ClearSelection();
+                    _previewPanel.SetTarget(value);
+                }
+                else
+                {
+                    // Null value set; clear list selection.
+                    _selectedVehiclePanel.ClearSelection();
+                }
+
+                // Update button states.
+                SelectionUpdated();
+            }
+        }
+
+        /// <summary>
+        /// Sets the currently selected vehicle from the list of all currently unselected vehicles.
+        /// </summary>
+        internal VehicleInfo SelectedListVehicle
+        {
+            set
+            {
+                _selectedListVehicle = value;
+
+                if (value != null)
+                {
+                    // Clear other vehicle list selection if this is active.
+                    _selectedVehiclePanel.ClearSelection();
+                    _previewPanel.SetTarget(value);
+                }
+                else
+                {
+                    // Null value set; clear list selection.
+                    _vehicleSelectionPanel.ClearSelection();
+                }
+
+                // Update button states.
+                SelectionUpdated();
+            }
         }
 
         /// <summary>
@@ -99,7 +178,7 @@ namespace VehicleSelector
         internal TransferManager.TransferReason TransferReason { get; private set; }
 
         /// <summary>
-        /// Gets othe currently selected building.
+        /// Gets the currently selected building.
         /// </summary>
         internal ushort CurrentBuilding { get; private set; }
 
@@ -136,8 +215,8 @@ namespace VehicleSelector
         /// </summary>
         internal void SelectionUpdated()
         {
-            _addVehicleButton.isEnabled = _vehicleSelectionPanel.SelectedVehicle != null;
-            _removeVehicleButton.isEnabled = _selectedVehiclePanel.SelectedVehicle != null;
+            _addVehicleButton.isEnabled = _selectedListVehicle != null;
+            _removeVehicleButton.isEnabled = _selectedBuildingVehicle != null;
         }
 
         /// <summary>
@@ -149,12 +228,8 @@ namespace VehicleSelector
             // Add vehicle to building.
             VehicleControl.AddVehicle(CurrentBuilding, TransferReason, vehicle);
 
-            // Update current selection.
-            _selectedVehiclePanel.SelectedVehicle = vehicle;
-
-            // Update district lists.
-            _selectedVehiclePanel.RefreshList();
-            _vehicleSelectionPanel.RefreshList();
+            // Update lists.
+            Refresh();
         }
 
         /// <summary>
@@ -164,14 +239,10 @@ namespace VehicleSelector
         private void RemoveVehicle()
         {
             // Remove selected vehicle from building.
-            VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _selectedVehiclePanel.SelectedVehicle);
+            VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _selectedBuildingVehicle);
 
-            // Clear current selection.
-            _selectedVehiclePanel.SelectedVehicle = null;
-
-            // Update vehicle lists.
-            _selectedVehiclePanel.RefreshList();
-            _vehicleSelectionPanel.RefreshList();
+            // Update lists.
+            Refresh();
         }
     }
 }
