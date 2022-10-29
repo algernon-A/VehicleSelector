@@ -266,6 +266,13 @@ namespace VehicleSelector
                         if (buildingInfo.m_buildingAI is PlayerBuildingAI playerBuildingAI)
                         {
                             VehicleInfo.VehicleType vehicleType = playerBuildingAI.GetVehicleType();
+
+                            // Additional check for passenger planes.
+                            if (buildingSubService == ItemClass.SubService.PublicTransportPlane)
+                            {
+                                vehicleType = VehicleInfo.VehicleType.Plane;
+                            }
+
                             if (vehicleType != VehicleInfo.VehicleType.None && vehicleType != vehicle.m_vehicleType)
                             {
                                 continue;
