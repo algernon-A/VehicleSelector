@@ -28,7 +28,7 @@ namespace VehicleSelector
         /// <summary>
         /// Selection list column width.
         /// </summary>
-        internal const float ListWidth = 310f;
+        internal const float ListWidth = 340f;
 
         /// <summary>
         /// Preview column width.
@@ -197,15 +197,19 @@ namespace VehicleSelector
                 TransferReason = reason;
                 _titleLabel.text = title;
 
+                // Regenerate lists.
                 Refresh();
             }
         }
 
         /// <summary>
-        /// Refreshes list contents.
+        /// Refreshes list contents and clears the preview display.
         /// </summary>
         internal void Refresh()
         {
+            // Clear preview.
+            _previewPanel.SetTarget(null);
+
             _selectedVehiclePanel.RefreshList();
             _vehicleSelectionPanel.RefreshList();
         }
