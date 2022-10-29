@@ -6,6 +6,7 @@
 namespace VehicleSelector
 {
     using AlgernonCommons.UI;
+    using AlgernonCommons.Utils;
     using ColossalFramework.UI;
     using UnityEngine;
 
@@ -21,12 +22,18 @@ namespace VehicleSelector
 
         // Layout constants - private.
         private const float VehicleSpriteSize = 40f;
+        private const float SteamSpriteWidth = 26f;
+        private const float SteamSpriteHeight = 16f;
+        private const float ScrollMargin = 10f;
 
         // Vehicle name label.
-        private UILabel vehicleNameLabel;
+        private UILabel _vehicleNameLabel;
 
         // Preview image.
-        private UISprite vehicleSprite;
+        private UISprite _vehicleSprite;
+
+        // Steam icon.
+        private UISprite _steamSprite;
 
         /// <summary>
         /// Vehicle prefab.
@@ -46,31 +53,41 @@ namespace VehicleSelector
         public override void Display(object data, int rowIndex)
         {
             // Perform initial setup for new rows.
-            if (vehicleNameLabel == null)
+            if (_vehicleNameLabel == null)
             {
                 // Add object name label.
-                vehicleNameLabel = AddLabel(VehicleSpriteSize + Margin, width - Margin - VehicleSpriteSize - Margin, wordWrap: true);
+                _vehicleNameLabel = AddLabel(VehicleSpriteSize + Margin, width - Margin - VehicleSpriteSize - Margin - SteamSpriteWidth - ScrollMargin - Margin, wordWrap: true);
 
                 // Add preview sprite image.
-                vehicleSprite = AddUIComponent<UISprite>();
-                vehicleSprite.height = VehicleSpriteSize;
-                vehicleSprite.width = VehicleSpriteSize;
-                vehicleSprite.relativePosition = Vector2.zero;
+                _vehicleSprite = AddUIComponent<UISprite>();
+                _vehicleSprite.height = VehicleSpriteSize;
+                _vehicleSprite.width = VehicleSpriteSize;
+                _vehicleSprite.relativePosition = Vector2.zero;
+
+                // Add setam sprite.
+                _steamSprite = AddUIComponent<UISprite>();
+                _steamSprite.width = SteamSpriteWidth;
+                _steamSprite.height = SteamSpriteHeight;
+                _steamSprite.atlas = UITextures.InGameAtlas;
+                _steamSprite.spriteName = "SteamWorkshop";
+                _steamSprite.relativePosition = new Vector2(width - Margin - ScrollMargin - SteamSpriteWidth, (height - SteamSpriteHeight) / 2f);
             }
 
             // Get building ID and set name label.
             if (data is VehicleItem thisItem)
             {
                 _info = thisItem.Info;
-                vehicleNameLabel.text = thisItem.Name;
+                _vehicleNameLabel.text = thisItem.Name;
 
-                vehicleSprite.atlas = _info?.m_Atlas;
-                vehicleSprite.spriteName = _info?.m_Thumbnail;
+                _vehicleSprite.atlas = _info?.m_Atlas;
+                _vehicleSprite.spriteName = _info?.m_Thumbnail;
+
+                _steamSprite.isVisible = PrefabUtils.IsWorkshopAsset(_info);
             }
             else
             {
                 // Just in case (no valid vehicle record).
-                vehicleNameLabel.text = string.Empty;
+                _vehicleNameLabel.text = string.Empty;
             }
 
             // Set initial background as deselected state.
