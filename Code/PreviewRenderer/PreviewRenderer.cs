@@ -18,7 +18,7 @@ namespace VehicleSelector
         private Mesh _mesh;
         private Material _material;
         private float _rotation = 35f;
-        private float _zoom = 4f;
+        private float _zoom = 3f;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PreviewRenderer"/> class.
@@ -149,10 +149,6 @@ namespace VehicleSelector
             Light renderLight = DayNightProperties.instance.sunLightSource;
             RenderManager.instance.MainLight = renderLight;
 
-            // Set model position.
-            // We render at -100 Y to avoid garbage left at 0,0 by certain shaders and renderers (and we only rotate around the Y axis so will never see the origin).
-            Vector3 modelPosition = new Vector3(0f, -100f, 0f);
-
             // Reset the bounding box to be the smallest that can encapsulate all verticies of the new mesh.
             // That way the preview image is the largest size that fits cleanly inside the preview size.
             Bounds currentBounds = new Bounds(Vector3.zero, Vector3.zero);
@@ -201,7 +197,7 @@ namespace VehicleSelector
             if (_material != null)
             {
                 // Calculate rendering matrix and add mesh to scene.
-                Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
+                Matrix4x4 matrix = Matrix4x4.TRS(Vector3.zero, modelRotation, Vector3.one);
                 Graphics.DrawMesh(_mesh, matrix, previewMaterial, 0, _renderCamera, 0, null, true, true);
             }
 
@@ -215,10 +211,10 @@ namespace VehicleSelector
             _renderCamera.farClipPlane = clipCenter + clipExtent;
 
             // Rotate our camera around the model according to our current rotation.
-            _renderCamera.transform.position = modelPosition + (Vector3.forward * clipCenter);
+            _renderCamera.transform.position = Vector3.forward * clipCenter;
 
             // Aim camera at middle of bounds.
-            _renderCamera.transform.LookAt(currentBounds.center + modelPosition);
+            _renderCamera.transform.LookAt(currentBounds.center);
 
             // If game is currently in nighttime, enable sun and disable moon lighting.
             if (gameMainLight == DayNightProperties.instance.moonLightSource)
@@ -228,7 +224,7 @@ namespace VehicleSelector
             }
 
             // Light settings.
-            renderLight.transform.eulerAngles = new Vector3(40, 210, 70);
+            renderLight.transform.eulerAngles = new Vector3(45f, 180f, 0f);
             renderLight.intensity = 2f;
             renderLight.color = Color.white;
 
