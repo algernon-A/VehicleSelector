@@ -292,6 +292,20 @@ namespace VehicleSelector
                         transfers[0].Reason = TransferManager.TransferReason.None;
                         return 1;
                     }
+                    else if (buildingInfo.m_buildingAI is AirportGateAI)
+                    {
+                        // Airport passenger gate.
+                        transfers[0].Title = Translations.Translate("AIR_PASSENGER");
+                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        return 1;
+                    }
+                    else if (buildingInfo.m_buildingAI is AirportCargoGateAI)
+                    {
+                        // Airport passenger gate.
+                        transfers[0].Title = Translations.Translate("AIR_CARGO");
+                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        return 1;
+                    }
 
                     // Unsupported public transport type.
                     return 0;

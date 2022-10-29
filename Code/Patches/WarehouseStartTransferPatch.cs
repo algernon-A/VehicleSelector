@@ -24,9 +24,9 @@ namespace VehicleSelector
         /// <returns>List of methods to transpile.</returns>
         public static IEnumerable<MethodBase> TargetMethods()
         {
-            yield return typeof(WarehouseAI).GetMethod(nameof(WarehouseAI.StartTransfer));
-            yield return typeof(ExtractingFacilityAI).GetMethod(nameof(ExtractingFacilityAI.StartTransfer));
-            yield return typeof(ProcessingFacilityAI).GetMethod(nameof(ProcessingFacilityAI.StartTransfer));
+            yield return AccessTools.Method(typeof(WarehouseAI), nameof(WarehouseAI.StartTransfer));
+            yield return AccessTools.Method(typeof(ExtractingFacilityAI), nameof(ExtractingFacilityAI.StartTransfer));
+            yield return AccessTools.Method(typeof(ProcessingFacilityAI), nameof(ProcessingFacilityAI.StartTransfer));
         }
 
         /// <summary>
@@ -40,8 +40,8 @@ namespace VehicleSelector
             Logging.Message("transpiling ", original.DeclaringType, ":", original.Name);
 
             // Reflection to get original and inserted methods for calls.
-            MethodInfo getTransferVehicle = typeof(WarehouseAI).GetMethod(nameof(WarehouseAI.GetTransferVehicleService), BindingFlags.Public | BindingFlags.Static);
-            MethodInfo chooseVehicle = typeof(WarehouseStartTransferPatch).GetMethod(nameof(WarehouseStartTransferPatch.ChooseVehicle));
+            MethodInfo getTransferVehicle = AccessTools.Method(typeof(WarehouseAI), nameof(WarehouseAI.GetTransferVehicleService));
+            MethodInfo chooseVehicle = AccessTools.Method(typeof(WarehouseStartTransferPatch), nameof(ChooseVehicle));
 
             // Instruction enumerator.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();

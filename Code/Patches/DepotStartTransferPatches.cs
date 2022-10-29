@@ -1,4 +1,4 @@
-﻿// <copyright file="DepotStartTransfer.cs" company="algernon (K. Algernon A. Sheppard)">
+﻿// <copyright file="DepotStartTransferPatches.cs" company="algernon (K. Algernon A. Sheppard)">
 // Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
@@ -16,7 +16,7 @@ namespace VehicleSelector
     /// Harmony transpiler to DepotAI.StartTransfer to implement vehicle selection.
     /// </summary>
     [HarmonyPatch(typeof(DepotAI), nameof(DepotAI.StartTransfer))]
-    public static class DepotStartTransfer
+    public static class DepotStartTransferPatches
     {
         /// <summary>
         /// Harmony transpiler for o DepotAI.GetPrimaryRandomVehicleInfo, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
@@ -29,8 +29,8 @@ namespace VehicleSelector
             Logging.Message("transpiling ", original.DeclaringType, ":", original.Name);
 
             // Reflection to get original and inserted methods for calls.
-            MethodInfo getPrimaryRandomVehicleInfo = typeof(DepotAI).GetMethod("GetPrimaryRandomVehicleInfo", BindingFlags.Instance | BindingFlags.NonPublic);
-            MethodInfo chooseVehicle = typeof(DepotStartTransfer).GetMethod(nameof(DepotStartTransfer.ChooseVehicle));
+            MethodInfo getPrimaryRandomVehicleInfo = AccessTools.Method(typeof(DepotAI), "GetPrimaryRandomVehicleInfo");
+            MethodInfo chooseVehicle = AccessTools.Method(typeof(DepotStartTransferPatches), nameof(ChooseVehicle));
 
             // Instruction enumerator.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
