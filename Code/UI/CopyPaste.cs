@@ -37,7 +37,7 @@ namespace VehicleSelector
         /// <param name="buildingID">Source building ID.</param>
         internal static void Copy(ushort buildingID)
         {
-            // Safetey check.
+            // Safety check.
             if (buildingID == 0)
             {
                 Logging.Error("zero buildingID passed to CopyPaste.Copy");
@@ -75,6 +75,89 @@ namespace VehicleSelector
                         CopyBuffer[i].AddRange(thisList);
                         CopyReasons[i] = TransferBuffer[i].Reason;
                         s_isCopied = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies the current settings of the given building to all others of the same type, optionally limiting to a district and/or park area.
+        /// </summary>
+        /// <param name="buildingID">Source building ID.</param>
+        /// <param name="district">District to limit to (0 for no limit).</param>
+        /// <param name="park">Park area to limit to (0 for no limit).</param>
+        internal static void CopyToBuildings(ushort buildingID, byte district, byte park)
+        {
+            // Safety check.
+            if (buildingID == 0)
+            {
+                Logging.Error("zero buildingID passed to CopyPaste.CopyToBuildings");
+                return;
+            }
+
+            // Local references.
+            Building[] buildingBuffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
+            DistrictManager districtManager = Singleton<DistrictManager>.instance;
+
+            // Get building prefab.
+            BuildingInfo buildingInfo = buildingBuffer[buildingID].Info;
+            if (buildingInfo == null)
+            {
+                Logging.Error("invalid buildingID passed to CopyPaste.CopyToBuildings");
+                return;
+            }
+
+            // Determine if any district or park restrictions apply.
+            bool restricted = district != 0 | park != 0;
+
+            // Number of records to copy - make sure there's at least one before proceeding.
+            int numTransfers = Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer);
+            Transfers.TransferStruct[] candidateBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
+
+            // Make sure there's at least one transfer before proceeding.
+            if (numTransfers > 0)
+            {
+                ItemClass.Service service = buildingInfo.GetService();
+                ItemClass.SubService subService = buildingInfo.GetSubService();
+
+                // Copy to all other buildings.
+                for (ushort i = 0; i < buildingBuffer.Length; ++i)
+                {
+                    // Look for any created buildings with matching service and subservice that aren't this one.
+                    if ((buildingBuffer[i].m_flags & Building.Flags.Created) != 0 && i != buildingID)
+                    {
+                        // Check for matching service and subservice.
+                        BuildingInfo candidateInfo = buildingBuffer[i].Info;
+                        if (candidateInfo.GetService() != service || candidateInfo.GetSubService() != subService)
+                        {
+                            continue;
+                        }
+
+                        // Check for matching transfer count.
+                        if (Transfers.BuildingEligibility(i, candidateInfo, candidateBuffer) != numTransfers)
+                        {
+                            continue;
+                        }
+
+                        // Apply any district and park restrictions.
+                        if (restricted)
+                        {
+                            if ((district != 0 && districtManager.GetDistrict(buildingBuffer[i].m_position) != district) || (park != 0 && districtManager.GetPark(buildingBuffer[i].m_position) != park))
+                            {
+                                continue;
+                            }
+                        }
+
+                        // Paste vehicles.
+                        for (int j = 0; j < numTransfers; ++j)
+                        {
+                            // Check for reason match.
+                            TransferManager.TransferReason reason = TransferBuffer[j].Reason;
+                            if (reason == candidateBuffer[j].Reason)
+                            {
+                                VehicleControl.PasteVehicles(i, reason, VehicleControl.GetVehicles(buildingID, reason));
+                            }
+                        }
                     }
                 }
             }
@@ -129,7 +212,7 @@ namespace VehicleSelector
                 return false;
             }
 
-            // Safetey check.
+            // Safety check.
             if (buildingID == 0)
             {
                 Logging.Error("zero buildingID passed to CopyPaste.Paste");

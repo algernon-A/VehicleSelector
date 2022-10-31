@@ -125,8 +125,17 @@ namespace VehicleSelector
                 return;
             }
 
-            // Do we have an existing entry?
+            // Get entry key.
             uint key = BuildKey(buildingID, material);
+
+            // Handle any null pastes (clear settings).
+            if (vehicles == null || vehicles.Count == 0)
+            {
+                AssignedVehicles.Remove(key);
+                return;
+            }
+
+            // Do we have an existing entry?
             if (AssignedVehicles.ContainsKey(key))
             {
                 // Yes - clear list.
@@ -203,6 +212,9 @@ namespace VehicleSelector
         internal static void Deserialize(BinaryReader reader)
         {
             Logging.Message("deserializing vehicle data");
+
+            // Clear dictionary.
+            AssignedVehicles.Clear();
 
             // Iterate through each entry read.
             int numEntries = reader.ReadInt32();

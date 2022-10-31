@@ -59,6 +59,8 @@ namespace VehicleSelector
         private ushort _currentBuilding;
         private int _numSelections;
         private BuildingInfo _thisBuildingInfo;
+        private byte _currentDistrict;
+        private byte _currentPark;
 
         // Event handling.
         private bool _copyProcessing = false;
@@ -122,9 +124,15 @@ namespace VehicleSelector
 
                 // Copy/paste buttons.
                 _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Copy"));
-                _copyButton.eventClicked += (c, p) => CopyPaste.Copy(CurrentBuilding);
+                _copyButton.eventClicked += (c, p) => CopyPaste.Copy(_currentBuilding);
                 _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Paste"));
                 _pasteButton.eventClicked += (c, p) => Paste();
+
+                // Copy to buttons.
+                _copyBuildingButton = UIButtons.AddIconButton(this, CopyButtonX - IconButtonSize - Margin, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-CopyBuilding"));
+                _copyBuildingButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, 0, 0);
+                _copyDistrictButton = UIButtons.AddIconButton(this, CopyButtonX - IconButtonSize - Margin - IconButtonSize - Margin, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-CopyDistrict"));
+                _copyDistrictButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, _currentDistrict, _currentPark);
 
                 // Add vehicle panels.
                 for (int i = 0; i < MaxTransfers; ++i)
@@ -288,27 +296,27 @@ namespace VehicleSelector
             StringBuilder districtText = new StringBuilder();
 
             // District area.
-            byte currentDistrict = districtManager.GetDistrict(buildingManager.m_buildings.m_buffer[_currentBuilding].m_position);
-            if (currentDistrict != 0)
+            _currentDistrict = districtManager.GetDistrict(buildingManager.m_buildings.m_buffer[_currentBuilding].m_position);
+            if (_currentDistrict != 0)
             {
-                districtText.Append(districtManager.GetDistrictName(currentDistrict));
+                districtText.Append(districtManager.GetDistrictName(_currentDistrict));
             }
 
             // Park area.
-            byte currentPark = districtManager.GetPark(buildingManager.m_buildings.m_buffer[_currentBuilding].m_position);
-            if (currentPark != 0)
+            _currentPark = districtManager.GetPark(buildingManager.m_buildings.m_buffer[_currentBuilding].m_position);
+            if (_currentPark != 0)
             {
                 // Add comma between district and park names if we have both.
-                if (currentDistrict != 0)
+                if (_currentDistrict != 0)
                 {
                     districtText.Append(", ");
                 }
 
-                districtText.Append(districtManager.GetParkName(currentPark));
+                districtText.Append(districtManager.GetParkName(_currentPark));
             }
 
             // If no current district or park, then display no area message.
-            if (currentDistrict == 0 && currentPark == 0)
+            if (_currentDistrict == 0 && _currentPark == 0)
             {
                 _areaLabel1.text = Translations.Translate("NO_DISTRICT");
                 _areaLabel2.Hide();
@@ -316,16 +324,16 @@ namespace VehicleSelector
             else
             {
                 // Current district and/or park - display generated text.
-                if (currentDistrict != 0)
+                if (_currentDistrict != 0)
                 {
                     // District label.
-                    _areaLabel1.text = districtManager.GetDistrictName(currentDistrict);
+                    _areaLabel1.text = districtManager.GetDistrictName(_currentDistrict);
 
                     // Is there also a park area?
-                    if (currentPark != 0)
+                    if (_currentPark != 0)
                     {
                         // Yes - set second label text and show.
-                        _areaLabel2.text = districtManager.GetParkName(currentPark);
+                        _areaLabel2.text = districtManager.GetParkName(_currentPark);
                         _areaLabel2.Show();
                     }
                     else
@@ -334,10 +342,10 @@ namespace VehicleSelector
                         _areaLabel2.Hide();
                     }
                 }
-                else if (currentPark != 0)
+                else if (_currentPark != 0)
                 {
                     // No district, but a park - set first area label text and hide the second label.
-                    _areaLabel1.text = districtManager.GetParkName(currentPark);
+                    _areaLabel1.text = districtManager.GetParkName(_currentPark);
                     _areaLabel2.Hide();
                 }
             }
@@ -348,8 +356,9 @@ namespace VehicleSelector
                 absolutePosition = new Vector2(absolutePosition.x, Screen.height - 120 - height);
             }
 
-            // Update paste button state.
+            // Update button states.
             _pasteButton.isEnabled = CopyPaste.IsValidTarget(CurrentBuilding);
+            _copyDistrictButton.isEnabled = _currentDistrict != 0 | _currentPark != 0;
 
             // Make sure we're visible if we're not already.
             Show();
