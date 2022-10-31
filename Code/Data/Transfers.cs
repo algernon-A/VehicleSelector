@@ -174,22 +174,74 @@ namespace VehicleSelector
 
                 case ItemClass.Service.Industrial:
                     // Zoned industry.
-                    transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                     switch (buildingInfo.m_class.m_subService)
                     {
                         case ItemClass.SubService.IndustrialForestry:
-                            transfers[0].Reason = TransferManager.TransferReason.Lumber;
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level2)
+                            {
+                                // Extractors.
+                                transfers[0].Title = Translations.Translate("LOGS");
+                                transfers[0].Reason = TransferManager.TransferReason.Logs;
+                            }
+                            else
+                            {
+                                // Processors.
+                                transfers[0].Title = Translations.Translate("LUMBER");
+                                transfers[0].Reason = TransferManager.TransferReason.Lumber;
+                            }
+
                             break;
+
                         case ItemClass.SubService.IndustrialFarming:
-                            transfers[0].Reason = TransferManager.TransferReason.Food;
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level2)
+                            {
+                                // Extractors.
+                                transfers[0].Title = Translations.Translate("GRAIN");
+                                transfers[0].Reason = TransferManager.TransferReason.Grain;
+                            }
+                            else
+                            {
+                                // Processors.
+                                transfers[0].Title = Translations.Translate("FOOD");
+                                transfers[0].Reason = TransferManager.TransferReason.Food;
+                            }
+
                             break;
+
                         case ItemClass.SubService.IndustrialOil:
-                            transfers[0].Reason = TransferManager.TransferReason.Petrol;
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level2)
+                            {
+                                // Extractors.
+                                transfers[0].Title = Translations.Translate("OIL");
+                                transfers[0].Reason = TransferManager.TransferReason.Oil;
+                            }
+                            else
+                            {
+                                // Processors.
+                                transfers[0].Title = Translations.Translate("PETROL");
+                                transfers[0].Reason = TransferManager.TransferReason.Petrol;
+                            }
+
                             break;
+
                         case ItemClass.SubService.IndustrialOre:
-                            transfers[0].Reason = TransferManager.TransferReason.Coal;
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level2)
+                            {
+                                // Extractors.
+                                transfers[0].Title = Translations.Translate("ORE");
+                                transfers[0].Reason = TransferManager.TransferReason.Ore;
+                            }
+                            else
+                            {
+                                // Processors.
+                                transfers[0].Title = Translations.Translate("COAL");
+                                transfers[0].Reason = TransferManager.TransferReason.Coal;
+                            }
+
                             break;
+
                         default:
+                            transfers[0].Title = Translations.Translate("CARGO_TRUCK");
                             transfers[0].Reason = TransferManager.TransferReason.Goods;
                             break;
                     }

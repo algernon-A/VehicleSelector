@@ -35,6 +35,7 @@ namespace VehicleSelector
             yield return typeof(FireStationAI).GetMethod(nameof(FireStationAI.StartTransfer));
             yield return typeof(DisasterResponseBuildingAI).GetMethod(nameof(DisasterResponseBuildingAI.StartTransfer));
             yield return typeof(IndustrialBuildingAI).GetMethod(nameof(IndustrialBuildingAI.StartTransfer));
+            yield return typeof(IndustrialExtractorAI).GetMethod(nameof(IndustrialExtractorAI.StartTransfer));
             yield return typeof(FishingHarborAI).GetMethod(nameof(FishingHarborAI.StartTransfer));
             yield return typeof(FishFarmAI).GetMethod(nameof(FishFarmAI.StartTransfer));
 
