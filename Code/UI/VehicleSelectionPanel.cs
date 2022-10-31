@@ -104,126 +104,10 @@ namespace VehicleSelector
 
             // Local references.
             Building[] buildingBuffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
-            BuildingInfo buildingInfo = buildingBuffer[currentBuilding].Info;
-            ItemClass buildingClass = buildingInfo.m_class;
-            ItemClass.Service buildingService = buildingClass.m_service;
-            ItemClass.SubService buildingSubService = buildingClass.m_subService;
-            ItemClass.Level buildingLevel = buildingClass.m_level;
-
             List<VehicleItem> items = new List<VehicleItem>();
 
-            // Player industry requires some translation into private industry equivalents.
-            if (buildingService == ItemClass.Service.PlayerIndustry)
-            {
-                buildingService = ItemClass.Service.Industrial;
-                buildingSubService = ItemClass.SubService.None;
-
-                // Get building transfer type for those buildings with variable types.
-                TransferManager.TransferReason variableTransferReason = TransferManager.TransferReason.None;
-                switch (buildingInfo.m_buildingAI)
-                {
-                    case WarehouseAI warehouseAI:
-                        variableTransferReason = warehouseAI.GetTransferReason(currentBuilding, ref buildingBuffer[currentBuilding]);
-                        break;
-                    case ExtractingFacilityAI extractorAI:
-                        variableTransferReason = extractorAI.m_outputResource;
-                        break;
-                    case ProcessingFacilityAI processorAI:
-                        variableTransferReason = processorAI.m_outputResource;
-                        break;
-                }
-
-                // Translate into private industry equivalents - conversions are from WarehouseAI.GetTransferVehicleService.
-                switch (variableTransferReason)
-                {
-                    // Ore.
-                    case TransferManager.TransferReason.Ore:
-                    case TransferManager.TransferReason.Coal:
-                    case TransferManager.TransferReason.Glass:
-                    case TransferManager.TransferReason.Metals:
-                        buildingSubService = ItemClass.SubService.IndustrialOre;
-                        break;
-
-                    // Forestry.
-                    case TransferManager.TransferReason.Logs:
-                    case TransferManager.TransferReason.Lumber:
-                    case TransferManager.TransferReason.Paper:
-                    case TransferManager.TransferReason.PlanedTimber:
-                        buildingSubService = ItemClass.SubService.IndustrialForestry;
-                        break;
-
-                    // Oil.
-                    case TransferManager.TransferReason.Oil:
-                    case TransferManager.TransferReason.Petrol:
-                    case TransferManager.TransferReason.Petroleum:
-                    case TransferManager.TransferReason.Plastics:
-                        buildingSubService = ItemClass.SubService.IndustrialOil;
-                        break;
-
-                    // Farming.
-                    case TransferManager.TransferReason.Grain:
-                    case TransferManager.TransferReason.Food:
-                    case TransferManager.TransferReason.Flours:
-                        buildingSubService = ItemClass.SubService.IndustrialFarming;
-                        break;
-
-                    // Animal products have their own category.
-                    case TransferManager.TransferReason.AnimalProducts:
-                        buildingService = ItemClass.Service.PlayerIndustry;
-                        buildingSubService = ItemClass.SubService.PlayerIndustryFarming;
-                        break;
-
-                    // Generic goods.
-                    case TransferManager.TransferReason.Goods:
-                        buildingSubService = ItemClass.SubService.IndustrialGeneric;
-                        break;
-
-                    // Luxury products.
-                    case TransferManager.TransferReason.LuxuryProducts:
-                        buildingService = ItemClass.Service.PlayerIndustry;
-                        break;
-
-                    // Fish warehousing.
-                    case TransferManager.TransferReason.Fish:
-                        if (buildingInfo.m_buildingAI is WarehouseAI)
-                        {
-                            buildingService = ItemClass.Service.Fishing;
-                        }
-
-                        break;
-                }
-            }
-            else if (buildingSubService == ItemClass.SubService.PublicTransportPost)
-            {
-                // Special treatement for post offices - post vans have level 2, others level 5.
-                buildingLevel = ParentPanel.TransferReason == TransferManager.TransferReason.Mail ? ItemClass.Level.Level2 : ItemClass.Level.Level5;
-            }
-            else if (buildingService == ItemClass.Service.Fishing)
-            {
-                if (ParentPanel.TransferReason == TransferManager.TransferReason.None && buildingInfo.m_buildingAI is FishingHarborAI fishingHarborAI)
-                {
-                    // Fishing harbors, fishing boat selection - use boat class.
-                    buildingService = fishingHarborAI.m_boatClass.m_service;
-                    buildingSubService = fishingHarborAI.m_boatClass.m_subService;
-                    buildingLevel = fishingHarborAI.m_boatClass.m_level;
-                }
-                else if (buildingInfo.m_buildingAI is FishFarmAI)
-                {
-                    // Set fish farm AI to level 1 for fish trucks.
-                    buildingLevel = ItemClass.Level.Level1;
-                }
-                else if (buildingInfo.m_buildingAI is ProcessingFacilityAI)
-                {
-                    // Fish factories.
-                    buildingService = ItemClass.Service.Industrial;
-                    buildingSubService = ItemClass.SubService.IndustrialGeneric;
-                }
-            }
-            else if (ParentPanel.TransferReason == (TransferManager.TransferReason)120 || ParentPanel.TransferReason == (TransferManager.TransferReason)121)
-            {
-                // Prison helicopter mod transfers.
-                buildingLevel = ItemClass.Level.Level4;
-            }
+            // Determine effective building class for vehicle matching.
+            VehicleControl.GetEffectiveClass(currentBuilding, buildingBuffer, ParentPanel.TransferReason, out ItemClass.Service buildingService, out ItemClass.SubService buildingSubService, out ItemClass.Level buildingLevel);
 
             // Get list of already-selected vehicles.
             List<VehicleInfo> selectedList = VehicleControl.GetVehicles(currentBuilding, ParentPanel.TransferReason);
@@ -257,7 +141,7 @@ namespace VehicleSelector
                         }
 
                         // Check vehicle type, if applicable.
-                        if (buildingInfo.m_buildingAI is PlayerBuildingAI playerBuildingAI)
+                        if (buildingBuffer[currentBuilding].Info.m_buildingAI is PlayerBuildingAI playerBuildingAI)
                         {
                             VehicleInfo.VehicleType vehicleType = playerBuildingAI.GetVehicleType();
 

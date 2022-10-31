@@ -152,6 +152,146 @@ namespace VehicleSelector
         }
 
         /// <summary>
+        /// Gets the effective ItemClass for vehicle allocation for the given building.
+        /// </summary>
+        /// <param name="buildingID">Building ID.</param>
+        /// <param name="buildingBuffer">Building buffer.</param>
+        /// <param name="transferReason">Transfer reason.</param>
+        /// <param name="service">Effective service.</param>
+        /// <param name="subService">Effective sub-service.</param>
+        /// <param name="level">Effective level.</param>
+        internal static void GetEffectiveClass(ushort buildingID, Building[] buildingBuffer, TransferManager.TransferReason transferReason, out ItemClass.Service service, out ItemClass.SubService subService, out ItemClass.Level level)
+        {
+            // Local references.
+            BuildingInfo buildingInfo = buildingBuffer[buildingID].Info;
+            ItemClass originalClass = buildingInfo.m_class;
+            ItemClass.Service originalService = originalClass.m_service;
+
+            // Return values.
+            ItemClass.Service effectiveService = originalService;
+            ItemClass.SubService effectiveSubService = originalClass.m_subService;
+            ItemClass.Level effectiveLevel = originalClass.m_level;
+
+            // Player industry requires some translation into private industry equivalents.
+            if (originalService == ItemClass.Service.PlayerIndustry)
+            {
+                effectiveService = ItemClass.Service.Industrial;
+                effectiveSubService = ItemClass.SubService.None;
+
+                // Get building transfer type for those buildings with variable types.
+                TransferManager.TransferReason variableTransferReason = TransferManager.TransferReason.None;
+                switch (buildingInfo.m_buildingAI)
+                {
+                    case WarehouseAI warehouseAI:
+                        variableTransferReason = warehouseAI.GetTransferReason(buildingID, ref buildingBuffer[buildingID]);
+                        break;
+                    case ExtractingFacilityAI extractorAI:
+                        variableTransferReason = extractorAI.m_outputResource;
+                        break;
+                    case ProcessingFacilityAI processorAI:
+                        variableTransferReason = processorAI.m_outputResource;
+                        break;
+                }
+
+                // Translate into private industry equivalents - conversions are from WarehouseAI.GetTransferVehicleService.
+                switch (variableTransferReason)
+                {
+                    // Ore.
+                    case TransferManager.TransferReason.Ore:
+                    case TransferManager.TransferReason.Coal:
+                    case TransferManager.TransferReason.Glass:
+                    case TransferManager.TransferReason.Metals:
+                        effectiveSubService = ItemClass.SubService.IndustrialOre;
+                        break;
+
+                    // Forestry.
+                    case TransferManager.TransferReason.Logs:
+                    case TransferManager.TransferReason.Lumber:
+                    case TransferManager.TransferReason.Paper:
+                    case TransferManager.TransferReason.PlanedTimber:
+                        effectiveSubService = ItemClass.SubService.IndustrialForestry;
+                        break;
+
+                    // Oil.
+                    case TransferManager.TransferReason.Oil:
+                    case TransferManager.TransferReason.Petrol:
+                    case TransferManager.TransferReason.Petroleum:
+                    case TransferManager.TransferReason.Plastics:
+                        effectiveSubService = ItemClass.SubService.IndustrialOil;
+                        break;
+
+                    // Farming.
+                    case TransferManager.TransferReason.Grain:
+                    case TransferManager.TransferReason.Food:
+                    case TransferManager.TransferReason.Flours:
+                        effectiveSubService = ItemClass.SubService.IndustrialFarming;
+                        break;
+
+                    // Animal products have their own category.
+                    case TransferManager.TransferReason.AnimalProducts:
+                        effectiveService = ItemClass.Service.PlayerIndustry;
+                        effectiveSubService = ItemClass.SubService.PlayerIndustryFarming;
+                        break;
+
+                    // Generic goods.
+                    case TransferManager.TransferReason.Goods:
+                        effectiveSubService = ItemClass.SubService.IndustrialGeneric;
+                        break;
+
+                    // Luxury products.
+                    case TransferManager.TransferReason.LuxuryProducts:
+                        effectiveService = ItemClass.Service.PlayerIndustry;
+                        break;
+
+                    // Fish warehousing.
+                    case TransferManager.TransferReason.Fish:
+                        if (buildingInfo.m_buildingAI is WarehouseAI)
+                        {
+                            effectiveService = ItemClass.Service.Fishing;
+                        }
+
+                        break;
+                }
+            }
+            else if (originalClass.m_subService == ItemClass.SubService.PublicTransportPost)
+            {
+                // Special treatement for post offices - post vans have level 2, others level 5.
+                effectiveLevel = transferReason == TransferManager.TransferReason.Mail ? ItemClass.Level.Level2 : ItemClass.Level.Level5;
+            }
+            else if (originalService == ItemClass.Service.Fishing)
+            {
+                if (transferReason == TransferManager.TransferReason.None && buildingInfo.m_buildingAI is FishingHarborAI fishingHarborAI)
+                {
+                    // Fishing harbors, fishing boat selection - use boat class.
+                    effectiveService = fishingHarborAI.m_boatClass.m_service;
+                    effectiveSubService = fishingHarborAI.m_boatClass.m_subService;
+                    effectiveLevel = fishingHarborAI.m_boatClass.m_level;
+                }
+                else if (buildingInfo.m_buildingAI is FishFarmAI)
+                {
+                    // Set fish farm AI to level 1 for fish trucks.
+                    effectiveLevel = ItemClass.Level.Level1;
+                }
+                else if (buildingInfo.m_buildingAI is ProcessingFacilityAI)
+                {
+                    // Fish factories.
+                    effectiveService = ItemClass.Service.Industrial;
+                    effectiveSubService = ItemClass.SubService.IndustrialGeneric;
+                }
+            }
+            else if (transferReason == (TransferManager.TransferReason)120 || transferReason == (TransferManager.TransferReason)121)
+            {
+                // Prison helicopter mod transfers.
+                effectiveLevel = ItemClass.Level.Level4;
+            }
+
+            // Populate return values.
+            service = effectiveService;
+            subService = effectiveSubService;
+            level = effectiveLevel;
+        }
+
+        /// <summary>
         /// Removes all references to a given building from the vehicle dictionary.
         /// </summary>
         /// <param name="buildingID">BuildingID to remove.</param>

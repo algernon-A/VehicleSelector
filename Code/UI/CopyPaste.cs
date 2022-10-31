@@ -117,24 +117,39 @@ namespace VehicleSelector
             // Make sure there's at least one transfer before proceeding.
             if (numTransfers > 0)
             {
-                ItemClass.Service service = buildingInfo.GetService();
-                ItemClass.SubService subService = buildingInfo.GetSubService();
+                // Determine effective building class for vehicle matching.
+                VehicleControl.GetEffectiveClass(
+                    buildingID,
+                    buildingBuffer,
+                    TransferManager.TransferReason.None,
+                    out ItemClass.Service service,
+                    out ItemClass.SubService subService,
+                    out ItemClass.Level level);
 
-                // Copy to all other buildings.
+                // Copy to all other matching buildings.
                 for (ushort i = 0; i < buildingBuffer.Length; ++i)
                 {
                     // Look for any created buildings with matching service and subservice that aren't this one.
                     if ((buildingBuffer[i].m_flags & Building.Flags.Created) != 0 && i != buildingID)
                     {
-                        // Check for matching service and subservice.
-                        BuildingInfo candidateInfo = buildingBuffer[i].Info;
-                        if (candidateInfo.GetService() != service || candidateInfo.GetSubService() != subService)
+                        // Check for matching vehicle selection effective class.
+                        VehicleControl.GetEffectiveClass(
+                            i,
+                            buildingBuffer,
+                            TransferManager.TransferReason.None,
+                            out ItemClass.Service candidateService,
+                            out ItemClass.SubService candidateSubService,
+                            out ItemClass.Level candidateLevel);
+
+                        if (!(candidateService == service
+                            && candidateSubService == subService
+                            && (candidateLevel == level || service == ItemClass.Service.Industrial || service == ItemClass.Service.PlayerIndustry)))
                         {
                             continue;
                         }
 
                         // Check for matching transfer count.
-                        if (Transfers.BuildingEligibility(i, candidateInfo, candidateBuffer) != numTransfers)
+                        if (Transfers.BuildingEligibility(i, buildingBuffer[i].Info, candidateBuffer) != numTransfers)
                         {
                             continue;
                         }
