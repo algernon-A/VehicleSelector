@@ -49,8 +49,10 @@ namespace VehicleSelector
 
         // Panel components.
         private readonly UILabel _titleLabel;
-        private readonly UIButton _addVehicleButton;
-        private readonly UIButton _removeVehicleButton;
+        private readonly UIButton _addButton;
+        private readonly UIButton _removeButton;
+        private readonly UIButton _addAllButton;
+        private readonly UIButton _removeAllButton;
         private readonly VehicleSelectionPanel _vehicleSelectionPanel;
         private readonly SelectedVehiclePanel _selectedVehiclePanel;
         private readonly PreviewPanel _previewPanel;
@@ -77,26 +79,48 @@ namespace VehicleSelector
             _titleLabel = UILabels.AddLabel(this, 0f, 10f, "Select vehicle", PanelWidth, 1f, UIHorizontalAlignment.Center);
 
             // 'Add vehicle' button.
-            _addVehicleButton = UIButtons.AddIconButton(
+            _addButton = UIButtons.AddIconButton(
                 this,
                 RightColumnX - ArrowSize - Margin,
                 VehicleListY,
                 ArrowSize,
-                UITextures.LoadQuadSpriteAtlas("TC-ArrowPlus"),
+                UITextures.LoadQuadSpriteAtlas("VS-Add"),
                 Translations.Translate("ADD_VEHICLE_TIP"));
-            _addVehicleButton.isEnabled = false;
-            _addVehicleButton.eventClicked += (control, clickEvent) => AddVehicle(_selectedListVehicle);
+            _addButton.isEnabled = false;
+            _addButton.eventClicked += (c, p) => AddVehicle(_selectedListVehicle);
+
+            // 'Add all vehicles' button.
+            _addAllButton = UIButtons.AddIconButton(
+                this,
+                RightColumnX - ArrowSize - Margin - ArrowSize - Margin,
+                VehicleListY,
+                ArrowSize,
+                UITextures.LoadQuadSpriteAtlas("VS-AddAll"),
+                Translations.Translate("ADD_ALL_TIP"));
+            _addAllButton.isEnabled = false;
+            _addAllButton.eventClicked += (c, p) => AddAllVehicles();
 
             // Remove vehicle button.
-            _removeVehicleButton = UIButtons.AddIconButton(
+            _removeButton = UIButtons.AddIconButton(
                 this,
                 MidControlX,
                 VehicleListY,
                 ArrowSize,
-                UITextures.LoadQuadSpriteAtlas("TC-ArrowMinus"),
+                UITextures.LoadQuadSpriteAtlas("VS-Remove"),
                 Translations.Translate("REMOVE_VEHICLE_TIP"));
-            _removeVehicleButton.isEnabled = false;
-            _removeVehicleButton.eventClicked += (control, clickEvent) => RemoveVehicle();
+            _removeButton.isEnabled = false;
+            _removeButton.eventClicked += (c, p) => RemoveVehicle();
+
+            // 'Remove all vehicles' button.
+            _removeAllButton = UIButtons.AddIconButton(
+                this,
+                MidControlX + ArrowSize + Margin,
+                VehicleListY,
+                ArrowSize,
+                UITextures.LoadQuadSpriteAtlas("VS-RemoveAll"),
+                Translations.Translate("REMOVE_ALL_TIP"));
+            _removeAllButton.isEnabled = false;
+            _removeAllButton.eventClicked += (c, p) => RemoveAllVehicles();
 
             // Vehicle selection panels.
             _selectedVehiclePanel = this.AddUIComponent<SelectedVehiclePanel>();
@@ -137,7 +161,7 @@ namespace VehicleSelector
                 }
 
                 // Update button states.
-                SelectionUpdated();
+                UpdateButtonStates();
             }
         }
 
@@ -163,7 +187,7 @@ namespace VehicleSelector
                 }
 
                 // Update button states.
-                SelectionUpdated();
+                UpdateButtonStates();
             }
         }
 
@@ -197,13 +221,13 @@ namespace VehicleSelector
                 TransferReason = reason;
                 _titleLabel.text = title;
 
-                // Regenerate lists.
+                // Regenerate lists and set button states..
                 Refresh();
             }
         }
 
         /// <summary>
-        /// Refreshes list contents and clears the preview display.
+        /// Refreshes list contents, clears the preview display, and updates button states.
         /// </summary>
         internal void Refresh()
         {
@@ -212,15 +236,19 @@ namespace VehicleSelector
 
             _selectedVehiclePanel.RefreshList();
             _vehicleSelectionPanel.RefreshList();
+
+            UpdateButtonStates();
         }
 
         /// <summary>
-        /// Update button states when vehicle selections are updated.
+        /// Updates button states according to the current state.
         /// </summary>
-        internal void SelectionUpdated()
+        internal void UpdateButtonStates()
         {
-            _addVehicleButton.isEnabled = _selectedListVehicle != null;
-            _removeVehicleButton.isEnabled = _selectedBuildingVehicle != null;
+            _addButton.isEnabled = _selectedListVehicle != null;
+            _addAllButton.isEnabled = _vehicleSelectionPanel.VehicleList.Data.m_size > 0;
+            _removeButton.isEnabled = _selectedBuildingVehicle != null;
+            _removeAllButton.isEnabled = _selectedVehiclePanel.VehicleList.Data.m_size > 0;
         }
 
         /// <summary>
@@ -237,13 +265,42 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Removes the currently selected district from the list for this building.
-        /// Should be called as base after district has been updated by child class.
+        /// Removes the currently selected vehicle from the list for this building.
         /// </summary>
         private void RemoveVehicle()
         {
             // Remove selected vehicle from building.
             VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, _selectedBuildingVehicle);
+
+            // Update lists.
+            Refresh();
+        }
+
+        /// <summary>
+        /// Adds all vehicles in the available vehicle list to this building.
+        /// </summary>
+        private void AddAllVehicles()
+        {
+            // Add all vehicles in target list to bulding.
+            foreach (VehicleItem item in _vehicleSelectionPanel.VehicleList.Data)
+            {
+                VehicleControl.AddVehicle(CurrentBuilding, TransferReason, item.Info);
+            }
+
+            // Update lists.
+            Refresh();
+        }
+
+        /// <summary>
+        /// Adds all vehicles in the available vehicle list to this building.
+        /// </summary>
+        private void RemoveAllVehicles()
+        {
+            // Add all vehicles in target list to bulding.
+            foreach (VehicleItem item in _selectedVehiclePanel.VehicleList.Data)
+            {
+                VehicleControl.RemoveVehicle(CurrentBuilding, TransferReason, item.Info);
+            }
 
             // Update lists.
             Refresh();
