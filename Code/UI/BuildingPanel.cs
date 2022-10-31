@@ -37,9 +37,11 @@ namespace VehicleSelector
         private const float VehicleSelectionHeight = VehicleSelection.PanelHeight + Margin;
         private const float NoPanelHeight = ListY + Margin;
         private const float IconButtonSize = 40f;
-        private const float IconButtonY = TitleHeight + Margin;
+        private const float IconButtonY = ListY - IconButtonSize - Margin;
         private const float PasteButtonX = PanelWidth - IconButtonSize - Margin;
         private const float CopyButtonX = PasteButtonX - IconButtonSize - Margin;
+        private const float CopyBuildingButtonX = CopyButtonX - IconButtonSize - Margin;
+        private const float CopyDistrictButtonX = CopyBuildingButtonX - IconButtonSize - Margin;
         private const float PanelWidth = VehicleSelection.PanelWidth + Margin + Margin;
 
         // Panel components.
@@ -131,7 +133,7 @@ namespace VehicleSelector
                 // Copy to buttons.
                 _copyBuildingButton = UIButtons.AddIconButton(
                     this,
-                    CopyButtonX - IconButtonSize - Margin,
+                    CopyBuildingButtonX,
                     IconButtonY,
                     IconButtonSize,
                     UITextures.LoadQuadSpriteAtlas("VS-CopyBuilding"),
@@ -139,7 +141,7 @@ namespace VehicleSelector
                 _copyBuildingButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, 0, 0);
                 _copyDistrictButton = UIButtons.AddIconButton(
                     this,
-                    CopyButtonX - IconButtonSize - Margin - IconButtonSize - Margin,
+                    CopyDistrictButtonX,
                     IconButtonY,
                     IconButtonSize,
                     UITextures.LoadQuadSpriteAtlas("VS-CopyDistrict"),
