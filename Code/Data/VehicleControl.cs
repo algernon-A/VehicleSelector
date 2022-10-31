@@ -180,9 +180,8 @@ namespace VehicleSelector
         /// <param name="writer">Binary writer instance to serialize to.</param>
         internal static void Serialize(BinaryWriter writer)
         {
-            Logging.Message("serializing vehicle data");
-
             // Write length of dictionary.
+            Logging.Message("serializing vehicle data with ", AssignedVehicles.Count, " entries");
             writer.Write(AssignedVehicles.Count);
 
             // Serialise each building entry.
@@ -211,13 +210,12 @@ namespace VehicleSelector
         /// <param name="reader">Binary reader instance to deserialize from.</param>
         internal static void Deserialize(BinaryReader reader)
         {
-            Logging.Message("deserializing vehicle data");
-
             // Clear dictionary.
             AssignedVehicles.Clear();
 
             // Iterate through each entry read.
             int numEntries = reader.ReadInt32();
+            Logging.Message("deserializing vehicle data with ", numEntries, " entries");
             for (int i = 0; i < numEntries; ++i)
             {
                 // Dictionary entry key.

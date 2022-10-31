@@ -76,6 +76,9 @@ namespace VehicleSelector
                         Logging.Message("read ", stream.Length);
                     }
                 }
+
+                // If we've read vehicle selector data, ignore any Transfer Controller data.
+                return;
             }
             else
             {
