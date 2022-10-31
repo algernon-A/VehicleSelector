@@ -123,15 +123,27 @@ namespace VehicleSelector
                 zoomButton.eventClicked += (c, p) => ZoomToBuilding(_currentBuilding);
 
                 // Copy/paste buttons.
-                _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Copy"));
+                _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Copy"), Translations.Translate("COPY_TIP"));
                 _copyButton.eventClicked += (c, p) => CopyPaste.Copy(_currentBuilding);
-                _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Paste"));
+                _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Paste"), Translations.Translate("PASTE_TIP"));
                 _pasteButton.eventClicked += (c, p) => Paste();
 
                 // Copy to buttons.
-                _copyBuildingButton = UIButtons.AddIconButton(this, CopyButtonX - IconButtonSize - Margin, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-CopyBuilding"));
+                _copyBuildingButton = UIButtons.AddIconButton(
+                    this,
+                    CopyButtonX - IconButtonSize - Margin,
+                    IconButtonY,
+                    IconButtonSize,
+                    UITextures.LoadQuadSpriteAtlas("VS-CopyBuilding"),
+                    Translations.Translate("COPY_BUILDING_TIP"));
                 _copyBuildingButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, 0, 0);
-                _copyDistrictButton = UIButtons.AddIconButton(this, CopyButtonX - IconButtonSize - Margin - IconButtonSize - Margin, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-CopyDistrict"));
+                _copyDistrictButton = UIButtons.AddIconButton(
+                    this,
+                    CopyButtonX - IconButtonSize - Margin - IconButtonSize - Margin,
+                    IconButtonY,
+                    IconButtonSize,
+                    UITextures.LoadQuadSpriteAtlas("VS-CopyDistrict"),
+                    Translations.Translate("COPY_DISTRICT_TIP"));
                 _copyDistrictButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, _currentDistrict, _currentPark);
 
                 // Add vehicle panels.
