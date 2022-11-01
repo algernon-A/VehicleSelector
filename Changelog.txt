@@ -3,3 +3,4 @@
 - Add support for snowplows
 - Fix button on cemetaries being partially covered by an invisible background panel
 - Fix park maintenance buildings having the title 'Road maintenance'
+- Add race condition guard if the user opens the panel when holding down the paste or copy keys

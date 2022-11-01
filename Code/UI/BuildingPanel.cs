@@ -65,6 +65,7 @@ namespace VehicleSelector
         private byte _currentPark;
 
         // Event handling.
+        private bool _panelReady = false;
         private bool _copyProcessing = false;
         private bool _pasteProcessing = false;
 
@@ -155,6 +156,9 @@ namespace VehicleSelector
                     _vehicleSelections[i].ParentPanel = this;
                     _vehicleSelections[i].relativePosition = new Vector2(Margin, ListY + (i * VehicleSelectionHeight));
                 }
+
+                // Enable events.
+                _panelReady = true;
             }
             catch (Exception e)
             {
@@ -183,6 +187,12 @@ namespace VehicleSelector
         /// </summary>
         public override void Update()
         {
+            // Don't do anything if not set up yet.
+            if (!_panelReady)
+            {
+                return;
+            }
+
             // Copy key processing - use event flag to avoid repeated triggering.
             if (ModSettings.KeyCopy.IsPressed())
             {
