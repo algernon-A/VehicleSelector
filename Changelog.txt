@@ -1,4 +1,6 @@
-﻿- Add support for cargo and passenger harbors
+﻿Version 1.1 -
+
+- Add support for cargo and passenger harbors
 - Add support for intercity buses (except for bus-intercity bus hub)
 - Add support for snowplows
 - Relocate conflicting Customize It Extended panel buttons
