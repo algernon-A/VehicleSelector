@@ -1,0 +1,1 @@
+﻿- Fix button on cemetaries being partially covered by an invisible background panel

@@ -182,7 +182,14 @@ namespace VehicleSelector
             {
                 // City service panel.
                 relativeX = 94f;
-                parent = wrapper.Find("MainSectionPanel")?.Find("MainBottom")?.Find("ButtonPanels")?.Find("ActionButtons")?.Find("ActionPanelPanel")?.Find("ActionPanel");
+                UIComponent buttonPanels = wrapper.Find("MainSectionPanel")?.Find("MainBottom")?.Find("ButtonPanels");
+                if (buttonPanels != null)
+                {
+                    parent = buttonPanels.Find("ActionButtons")?.Find("ActionPanelPanel")?.Find("ActionPanel");
+
+                    // Send park button panels to back.
+                    buttonPanels.Find("ParkButtons")?.SendToBack();
+                }
             }
 
             if (parent == null)
@@ -209,16 +216,15 @@ namespace VehicleSelector
             panelButton.name = "VehicleSelectorButton";
             panelButton.tooltip = Translations.Translate("MOD_NAME");
 
-
             UISprite buttonSprite = panelButton.AddUIComponent<UISprite>();
             buttonSprite.size = panelButton.size;
             buttonSprite.atlas = UITextures.LoadSingleSpriteAtlas("VS-Icon");
             buttonSprite.relativePosition = new Vector2(1f, 1f);
             buttonSprite.spriteName = "normal";
 
-
             // Set position.
             panelButton.relativePosition = new Vector2(relativeX, relativeY);
+            panelButton.BringToFront();
 
             // Event handler.
             panelButton.eventClick += (c, p) =>
