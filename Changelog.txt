@@ -1,1 +1,2 @@
-﻿- Fix button on cemetaries being partially covered by an invisible background panel
+﻿- Add support for snowplows
+- Fix button on cemetaries being partially covered by an invisible background panel
