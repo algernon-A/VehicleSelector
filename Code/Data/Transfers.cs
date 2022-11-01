@@ -282,14 +282,14 @@ namespace VehicleSelector
                     return 0;
 
                 case ItemClass.Service.Road:
-                case ItemClass.Service.Beautification:
-                    // Maintenance depots and snow dumps only, and only incoming.
                     if (buildingInfo.m_buildingAI is MaintenanceDepotAI)
                     {
+                        // Road maintenance.
                         transfers[0].Title = Translations.Translate("ROAD_MAINT");
                     }
                     else if (buildingInfo.m_buildingAI is SnowDumpAI)
                     {
+                        // Snow dumps.
                         transfers[0].Title = Translations.Translate("ROAD_SNOW");
                     }
                     else
@@ -300,6 +300,18 @@ namespace VehicleSelector
 
                     transfers[0].Reason = TransferManager.TransferReason.None;
                     return 1;
+
+                case ItemClass.Service.Beautification:
+                    if (buildingInfo.m_buildingAI is MaintenanceDepotAI)
+                    {
+                        // Park maintenance.
+                        transfers[0].Title = Translations.Translate("PARK_MAINT");
+                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        return 1;
+                    }
+
+                    // No other cases are supported.
+                    return 0;
 
                 case ItemClass.Service.PublicTransport:
                     if (buildingInfo.m_buildingAI is PostOfficeAI postOfficeAI)
