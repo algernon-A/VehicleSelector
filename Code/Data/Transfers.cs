@@ -358,6 +358,23 @@ namespace VehicleSelector
                         transfers[0].Reason = TransferManager.TransferReason.None;
                         return 1;
                     }
+                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportShip)
+                    {
+                        if (buildingInfo.m_class.m_level == ItemClass.Level.Level1)
+                        {
+                            // Passenger harbours.
+                            transfers[0].Title = Translations.Translate("SHIP_PASSENGER");
+                            transfers[0].Reason = TransferManager.TransferReason.None;
+                            return 1;
+                        }
+                        else if (buildingInfo.m_class.m_level == ItemClass.Level.Level4)
+                        {
+                            // Cargo harbours.
+                            transfers[0].Title = Translations.Translate("SHIP_CARGO");
+                            transfers[0].Reason = TransferManager.TransferReason.None;
+                            return 1;
+                        }
+                    }
 
                     // Unsupported public transport type.
                     return 0;

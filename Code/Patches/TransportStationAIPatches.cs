@@ -53,7 +53,6 @@ namespace VehicleSelector
             MethodInfo getRandomVehicleType = AccessTools.Method(typeof(VehicleManager), nameof(VehicleManager.GetRandomVehicleInfo), new Type[] { typeof(Randomizer).MakeByRefType(), typeof(ItemClass.Service), typeof(ItemClass.SubService), typeof(ItemClass.Level), typeof(VehicleInfo.VehicleType) });
             MethodInfo chooseVehicleType = AccessTools.Method(typeof(TransportStationAIPatches), nameof(ChooseVehicleType));
 
-
             // Instruction enumerator.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
 

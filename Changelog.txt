@@ -1,2 +1,3 @@
-﻿- Add support for snowplows
+﻿- Add support for cargo and passenger harbors
+- Add support for snowplows
 - Fix button on cemetaries being partially covered by an invisible background panel

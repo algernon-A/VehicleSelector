@@ -29,6 +29,8 @@
 "FISH_BOAT","Fishing boats","Vehicle selection title - fishing boats."
 "AIR_PASSENGER","Passenger planes","Vehicle selection title - passenger planes."
 "AIR_CARGO","Cargo planes","Vehicle selection title - cargo planes."
+"SHIP_PASSENGER","Passenger ships","Vehicle selection title - passenger ships."
+"SHIP_CARGO","Cargo ships","Vehicle selection title - cargo ships."
 "LOGS","Forestry products","Industrial transport vehicle selection title - logs (zoned forestry resource)."
 "LUMBER","Lumber","Industrial transport vehicle selectiawon title - lumber (zoned forestry processors)."
 "GRAIN","Agricultural products","Industrial transport vehicle selection title - grain (zoned farming resource)."
