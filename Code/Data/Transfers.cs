@@ -387,6 +387,13 @@ namespace VehicleSelector
                             return 1;
                         }
                     }
+                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus && buildingInfo.m_class.m_level == ItemClass.Level.Level3)
+                    {
+                        // Intercity busses.
+                        transfers[0].Title = Translations.Translate("BUS_INTERCITY");
+                        transfers[0].Reason = TransferManager.TransferReason.None;
+                        return 1;
+                    }
 
                     // Unsupported public transport type.
                     return 0;
