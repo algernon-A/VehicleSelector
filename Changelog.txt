@@ -1,4 +1,6 @@
-﻿Version 1.1 -
+﻿- Add support for cable cars
+
+Version 1.1 -
 
 - Add support for cargo and passenger harbors
 - Add support for intercity buses (except for bus-intercity bus hub)
