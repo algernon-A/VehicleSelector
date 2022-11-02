@@ -47,8 +47,6 @@ namespace VehicleSelector
             randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - randomLabel.height) / 2f);
         }
 
-
-
         /// <summary>
         /// Sets the currently selected vehicle.
         /// </summary>
