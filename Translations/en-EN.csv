@@ -23,7 +23,8 @@
 "MAIL_SORTED","Sorted mail transfer","Vehicle selection title - post office sorted mail transfer vehicles (post trucks), typically transferring from sorting depots to post offices."
 "MAIL_EXPORT","Intercity mail transfer","Vehicle selection title - post office intercity mail transfer vehicles (post trucks)."
 "TAXI","Taxis","Vehicle selection title - taxi vehicles."
-"CARGO_TRAIN","Cargo trains","Vehicle selection title - cargo trains."
+"TRAIN_CARGO","Cargo trains","Vehicle selection title - cargo trains."
+"TRAIN_PASSENGER","Intercity passenger trains","Vehicle selection title - passenger trains."
 "GARBAGE_COLLECTION","Garbage collection","Vehicle selection title - garbage collection vehicles"
 "GARBAGE_TRANSFER","Waste transfer","Vehicle selection title - garbage transfer vehicles (e.g. emptying landfills)."
 "FISH_TRUCK","Fish transport,"Vehicle selection title - fish transport trucks."C
