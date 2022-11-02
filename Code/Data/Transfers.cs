@@ -314,124 +314,128 @@ namespace VehicleSelector
                     return 0;
 
                 case ItemClass.Service.PublicTransport:
-                    if (buildingInfo.m_buildingAI is PostOfficeAI postOfficeAI)
+                    switch (buildingInfo.m_class.m_subService)
                     {
-                        // Post office vs. mail sorting facility - post offices have vans.
-                        if (postOfficeAI.m_postVanCount > 0)
-                        {
-                            // Post office.
-                            transfers[0].Title = Translations.Translate("MAIL_COLLECT");
-                            transfers[0].Reason = TransferManager.TransferReason.Mail;
-
-                            // Post offices send unsorted mail via their trucks.
-                            transfers[1].Title = Translations.Translate("MAIL_UNSORTED");
-                            transfers[1].Reason = TransferManager.TransferReason.UnsortedMail;
-
-                            // Post offices pick up sorted mail via their trucks.
-                            transfers[2].Title = Translations.Translate("MAIL_SORTED");
-                            transfers[2].Reason = TransferManager.TransferReason.SortedMail;
-
-                            return 3;
-                        }
-
-                        // Mail sorting facility.
-                        transfers[0].Title = Translations.Translate("MAIL_SORTED");
-                        transfers[0].Reason = TransferManager.TransferReason.SortedMail;
-
-                        transfers[1].Title = Translations.Translate("MAIL_EXPORT");
-                        transfers[1].Reason = TransferManager.TransferReason.OutgoingMail;
-                        return 2;
-                    }
-                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportTaxi)
-                    {
-                        // Taxi depots.
-                        transfers[0].Title = Translations.Translate("TAXI");
-                        transfers[0].Reason = TransferManager.TransferReason.Taxi;
-                        return 1;
-                    }
-                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportTrain)
-                    {
-                        if (buildingInfo.m_class.m_level == ItemClass.Level.Level1)
-                        {
-                            // Intercity passenger trains.
-                            transfers[0].Title = Translations.Translate("TRAIN_PASSENGER");
-                            transfers[0].Reason = TransferManager.TransferReason.None;
+                        case ItemClass.SubService.PublicTransportTaxi:
+                            // Taxi depots.
+                            transfers[0].Title = Translations.Translate("TAXI");
+                            transfers[0].Reason = TransferManager.TransferReason.Taxi;
                             return 1;
-                        }
 
-                        if (buildingInfo.m_class.m_level == ItemClass.Level.Level4)
-                        {
-                            // Cargo train terminals.
-                            transfers[0].Title = Translations.Translate("TRAIN_CARGO");
-                            transfers[0].Reason = TransferManager.TransferReason.None;
-                            return 1;
-                        }
-
-                        // Unsupported train type.
-                        return 0;
-                    }
-                    else if (buildingInfo.m_buildingAI is AirportGateAI)
-                    {
-                        // Airport passenger gate.
-                        transfers[0].Title = Translations.Translate("AIR_PASSENGER");
-                        transfers[0].Reason = TransferManager.TransferReason.None;
-                        return 1;
-                    }
-                    else if (buildingInfo.m_buildingAI is AirportCargoGateAI)
-                    {
-                        // Airport passenger gate.
-                        transfers[0].Title = Translations.Translate("AIR_CARGO");
-                        transfers[0].Reason = TransferManager.TransferReason.None;
-                        return 1;
-                    }
-                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportShip)
-                    {
-                        if (buildingInfo.m_class.m_level == ItemClass.Level.Level1)
-                        {
-                            // Passenger harbours.
-                            transfers[0].Title = Translations.Translate("SHIP_PASSENGER");
-                            transfers[0].Reason = TransferManager.TransferReason.None;
-                            return 1;
-                        }
-                        else if (buildingInfo.m_class.m_level == ItemClass.Level.Level4)
-                        {
-                            // Cargo harbours.
-                            transfers[0].Title = Translations.Translate("SHIP_CARGO");
-                            transfers[0].Reason = TransferManager.TransferReason.None;
-                            return 1;
-                        }
-                    }
-                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus)
-                    {
-                        bool isIntercityBus = buildingInfo.m_class.m_level == ItemClass.Level.Level3;
-
-                        // Check for secondary transport line info (bus-intercity bus hub).
-                        if (!isIntercityBus)
-                        {
-                            ItemClass secondaryClass = (buildingInfo.m_buildingAI as TransportStationAI)?.m_secondaryTransportInfo.m_class;
-                            if (secondaryClass != null)
+                        case ItemClass.SubService.PublicTransportTrain:
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level1)
                             {
-                                isIntercityBus = secondaryClass.m_subService == ItemClass.SubService.PublicTransportBus && secondaryClass.m_level == ItemClass.Level.Level3;
+                                // Intercity passenger trains.
+                                transfers[0].Title = Translations.Translate("TRAIN_PASSENGER");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
                             }
-                        }
 
-                        if (isIntercityBus)
-                        {
-                            // Intercity buses.
-                            transfers[0].Title = Translations.Translate("BUS_INTERCITY");
-                            transfers[0].Reason = TransferManager.TransferReason.None;
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level4)
+                            {
+                                // Cargo train terminals.
+                                transfers[0].Title = Translations.Translate("TRAIN_CARGO");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+
+                            // Unsupported train type.
+                            return 0;
+
+                        case ItemClass.SubService.PublicTransportShip:
+                            if (buildingInfo.m_class.m_level == ItemClass.Level.Level1)
+                            {
+                                // Passenger harbours.
+                                transfers[0].Title = Translations.Translate("SHIP_PASSENGER");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+                            else if (buildingInfo.m_class.m_level == ItemClass.Level.Level4)
+                            {
+                                // Cargo harbours.
+                                transfers[0].Title = Translations.Translate("SHIP_CARGO");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+
+                            // Unsupported ship type.
+                            return 0;
+
+                        case ItemClass.SubService.PublicTransportBus when buildingInfo.m_buildingAI is TransportStationAI transportStationAI:
+                            bool isIntercityBus = buildingInfo.m_class.m_level == ItemClass.Level.Level3;
+
+                            // Check for secondary transport line info (bus-intercity bus hub).
+                            if (!isIntercityBus)
+                            {
+                                ItemClass secondaryClass = transportStationAI.m_secondaryTransportInfo?.m_class;
+                                if (secondaryClass != null)
+                                {
+                                    isIntercityBus = secondaryClass.m_subService == ItemClass.SubService.PublicTransportBus && secondaryClass.m_level == ItemClass.Level.Level3;
+                                }
+                            }
+
+                            if (isIntercityBus)
+                            {
+                                // Intercity buses.
+                                transfers[0].Title = Translations.Translate("BUS_INTERCITY");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+
+                            // Unsupported bus type.
+                            return 0;
+
+                        case ItemClass.SubService.PublicTransportPlane:
+                            if (buildingInfo.m_buildingAI is TransportStationAI)
+                            {
+                                // Passenger aircraft.
+                                transfers[0].Title = Translations.Translate("AIR_PASSENGER");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+                            else if (buildingInfo.m_buildingAI is CargoStationAI)
+                            {
+                                // Cargo aircraft.
+                                transfers[0].Title = Translations.Translate("AIR_CARGO");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
+
+                            // Unsupported plane type.
+                            return 0;
+
+                        case ItemClass.SubService.PublicTransportPost when buildingInfo.m_buildingAI is PostOfficeAI postOfficeAI:
+                            // Post office vs. mail sorting facility - post offices have vans.
+                            if (postOfficeAI.m_postVanCount > 0)
+                            {
+                                // Post office.
+                                transfers[0].Title = Translations.Translate("MAIL_COLLECT");
+                                transfers[0].Reason = TransferManager.TransferReason.Mail;
+
+                                // Post offices send unsorted mail via their trucks.
+                                transfers[1].Title = Translations.Translate("MAIL_UNSORTED");
+                                transfers[1].Reason = TransferManager.TransferReason.UnsortedMail;
+
+                                // Post offices pick up sorted mail via their trucks.
+                                transfers[2].Title = Translations.Translate("MAIL_SORTED");
+                                transfers[2].Reason = TransferManager.TransferReason.SortedMail;
+
+                                return 3;
+                            }
+
+                            // Mail sorting facility.
+                            transfers[0].Title = Translations.Translate("MAIL_SORTED");
+                            transfers[0].Reason = TransferManager.TransferReason.SortedMail;
+
+                            transfers[1].Title = Translations.Translate("MAIL_EXPORT");
+                            transfers[1].Reason = TransferManager.TransferReason.OutgoingMail;
+                            return 2;
+
+                        case ItemClass.SubService.PublicTransportCableCar when buildingInfo.m_buildingAI is CableCarStationAI cableCarStationAI:
+                            // Cable cars.
+                            transfers[0].Title = Translations.Translate("CABLE_CAR");
+                            transfers[0].Reason = cableCarStationAI.m_transportInfo.m_vehicleReason;
                             return 1;
-                        }
-
-                        // Unsupported bus type.
-                        return 0;
-                    }
-                    else if (buildingInfo.m_buildingAI is CableCarStationAI cableCarStationAI)
-                    {
-                        // Cable cars.
-                        transfers[0].Title = Translations.Translate("CABLE_CAR");
-                        transfers[0].Reason = cableCarStationAI.m_transportInfo.m_vehicleReason;
-                        return 1;
                     }
 
                     // Unsupported public transport type.
