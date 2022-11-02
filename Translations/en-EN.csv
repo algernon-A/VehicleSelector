@@ -27,7 +27,7 @@
 "TRAIN_PASSENGER","Intercity passenger trains","Vehicle selection title - passenger trains."
 "GARBAGE_COLLECTION","Garbage collection","Vehicle selection title - garbage collection vehicles"
 "GARBAGE_TRANSFER","Waste transfer","Vehicle selection title - garbage transfer vehicles (e.g. emptying landfills)."
-"FISH_TRUCK","Fish transport,"Vehicle selection title - fish transport trucks."C
+"FISH_TRUCK","Fish transport","Vehicle selection title - fish transport trucks."
 "FISH_BOAT","Fishing boats","Vehicle selection title - fishing boats."
 "AIR_PASSENGER","Passenger planes","Vehicle selection title - passenger planes."
 "AIR_CARGO","Cargo planes","Vehicle selection title - cargo planes."
@@ -56,4 +56,3 @@
 "ZOOM_BUILDING","Zoom to building","Tooltop for 'zoom to selected building' button."
 "NO_DISTRICT","No local district","Displayed when selected building has no district."
 "ANY_VEHICLE","Any vehicle","Displayed when no specific vehicle is selected."
-"TRN_CHOICE","Set language"
