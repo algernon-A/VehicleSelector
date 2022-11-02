@@ -33,6 +33,12 @@ namespace VehicleSelector
             {
                 cieButton.relativePosition += new Vector3(40f, 0f, 0f);
             }
+
+            cieButton = UIView.library.Get<UniqueFactoryWorldInfoPanel>(typeof(UniqueFactoryWorldInfoPanel).Name).Find<UIButton>("CustomizeItExtendedButton");
+            if (cieButton != null)
+            {
+                cieButton.relativePosition -= new Vector3(0f, 40f, 0f);
+            }
         }
     }
 }
