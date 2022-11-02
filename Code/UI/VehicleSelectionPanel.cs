@@ -151,6 +151,17 @@ namespace VehicleSelector
                                 vehicleType = VehicleInfo.VehicleType.Plane;
                             }
 
+                            // Check to separate disaster helicopters and trucks.
+                            if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed)
+                            {
+                                vehicleType = VehicleInfo.VehicleType.Car;
+                            }
+                            else if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed2)
+                            {
+                                vehicleType = VehicleInfo.VehicleType.Helicopter;
+                            }
+
+                            // Check vehicle type.
                             if (vehicleType != VehicleInfo.VehicleType.None && vehicleType != vehicle.m_vehicleType)
                             {
                                 continue;

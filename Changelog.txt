@@ -2,6 +2,7 @@
 - Add support for cable cars
 - Add support for bus-intercity bus hub
 - Add support for vanilla airport and Industries DLC cargo airport
+- Fix disaster helicopters being selectable as trucks (and vice-versa)
 
 
 Version 1.1 -
