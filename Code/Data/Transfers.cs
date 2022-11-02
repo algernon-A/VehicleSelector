@@ -401,12 +401,30 @@ namespace VehicleSelector
                             return 1;
                         }
                     }
-                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus && buildingInfo.m_class.m_level == ItemClass.Level.Level3)
+                    else if (buildingInfo.m_class.m_subService == ItemClass.SubService.PublicTransportBus)
                     {
-                        // Intercity buses.
-                        transfers[0].Title = Translations.Translate("BUS_INTERCITY");
-                        transfers[0].Reason = TransferManager.TransferReason.None;
-                        return 1;
+                        bool isIntercityBus = buildingInfo.m_class.m_level == ItemClass.Level.Level3;
+
+                        // Check for secondary transport line info (bus-intercity bus hub).
+                        if (!isIntercityBus)
+                        {
+                            ItemClass secondaryClass = (buildingInfo.m_buildingAI as TransportStationAI)?.m_secondaryTransportInfo.m_class;
+                            if (secondaryClass != null)
+                            {
+                                isIntercityBus = secondaryClass.m_subService == ItemClass.SubService.PublicTransportBus && secondaryClass.m_level == ItemClass.Level.Level3;
+                            }
+                        }
+
+                        if (isIntercityBus)
+                        {
+                            // Intercity buses.
+                            transfers[0].Title = Translations.Translate("BUS_INTERCITY");
+                            transfers[0].Reason = TransferManager.TransferReason.None;
+                            return 1;
+                        }
+
+                        // Unsupported bus type.
+                        return 0;
                     }
                     else if (buildingInfo.m_buildingAI is CableCarStationAI cableCarStationAI)
                     {

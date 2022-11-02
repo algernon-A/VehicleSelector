@@ -1,5 +1,6 @@
 ﻿- Add support for intercity trains
 - Add support for cable cars
+- Add support for bus-intercity bus hub
 
 Version 1.1 -
 

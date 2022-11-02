@@ -279,6 +279,16 @@ namespace VehicleSelector
                     effectiveSubService = ItemClass.SubService.IndustrialGeneric;
                 }
             }
+            else if (originalClass.m_subService == ItemClass.SubService.PublicTransportBus && originalClass.m_level == ItemClass.Level.Level1)
+            {
+                // Bus station - check for secondary transport info.
+                ItemClass secondaryClass = (buildingInfo.m_buildingAI as TransportStationAI)?.m_secondaryTransportInfo?.m_class;
+                if (secondaryClass != null && secondaryClass.m_subService == ItemClass.SubService.PublicTransportBus)
+                {
+                    // Secondary info found - use that instead.
+                    effectiveLevel = secondaryClass.m_level;
+                }
+            }
             else if (transferReason == (TransferManager.TransferReason)120 || transferReason == (TransferManager.TransferReason)121)
             {
                 // Prison helicopter mod transfers.
