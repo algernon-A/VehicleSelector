@@ -15,8 +15,10 @@ namespace VehicleSelector
 
     /// <summary>
     /// Harmony patches to TransportStationAI to implement vehicle selection.
+    /// Runs after Transport Lines Manager, effictively meaning that TLM takes precedence if installed.
     /// </summary>
     [HarmonyPatch(typeof(TransportStationAI))]
+    [HarmonyAfter("com.klyte.redirectors.TLM")]
     public static class TransportStationAIPatches
     {
         /// <summary>

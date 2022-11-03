@@ -114,9 +114,11 @@ namespace VehicleSelector
         internal static void TargetChanged()
         {
             ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
-            bool supportedBuilding = Transfers.BuildingEligibility(buildingID);
+            bool supportedBuilding = Transfers.BuildingEligibility(buildingID, out bool tlmDisabled);
             s_privateBuildingButton.isVisible = supportedBuilding;
             s_playerBuildingButton.isVisible = supportedBuilding;
+            s_playerBuildingButton.isEnabled = !tlmDisabled;
+            s_playerBuildingButton.tooltip = Translations.Translate(tlmDisabled ? "TLM_DISABLE" : "MOD_NAME");
 
             // Don't do anything if panel isn't open.
             if (s_panel != null)
@@ -212,9 +214,10 @@ namespace VehicleSelector
             panelButton.color = new Color32(219, 219, 219, 255);
             panelButton.focusedColor = Color.white;
             panelButton.hoveredColor = Color.white;
-            panelButton.disabledColor = new Color32(93, 84, 84, 255);
+            panelButton.disabledColor = Color.white;
             panelButton.name = "VehicleSelectorButton";
             panelButton.tooltip = Translations.Translate("MOD_NAME");
+            panelButton.tooltipBox = UIToolTips.WordWrapToolTip;
 
             UISprite buttonSprite = panelButton.AddUIComponent<UISprite>();
             buttonSprite.size = panelButton.size;

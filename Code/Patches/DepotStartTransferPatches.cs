@@ -19,7 +19,8 @@ namespace VehicleSelector
     public static class DepotStartTransferPatches
     {
         /// <summary>
-        /// Harmony transpiler for o DepotAI.GetPrimaryRandomVehicleInfo, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
+        /// Harmony transpiler for DepotAI.GetPrimaryRandomVehicleInfo, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
+        /// Will be pre-empted (via Prefix) by Transport Lines Manager if installed and the depot is of a type supported by TLM.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <param name="original">Method being transpiled.</param>

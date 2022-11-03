@@ -5,6 +5,7 @@
 
 namespace VehicleSelector
 {
+    using AlgernonCommons;
     using AlgernonCommons.Patching;
     using ICities;
 
@@ -23,6 +24,9 @@ namespace VehicleSelector
 
             // Add building info panel buttons.
             BuildingPanelManager.AddInfoPanelButtons();
+
+            // Set TLM active flag if Transfer Lines Manager is present.
+            Transfers.TLMActive = AssemblyUtils.GetEnabledAssembly("TransportLinesManager") != null;
         }
     }
 }
