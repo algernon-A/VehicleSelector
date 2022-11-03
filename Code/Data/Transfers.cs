@@ -537,6 +537,14 @@ namespace VehicleSelector
                     // Unsupported case.
                     return 0;
 
+                case ItemClass.Service.Monument when buildingInfo.m_buildingAI is PrivateAirportAI:
+
+                    // Aviation club.
+                    transfers[0].Title = Translations.Translate("AIR_LIGHT");
+                    transfers[0].Reason = TransferManager.TransferReason.None;
+
+                    return 1;
+
                 default:
                     // If not explicitly supported, then it's not supported.
                     return 0;

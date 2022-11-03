@@ -1,4 +1,7 @@
-﻿Version 1.2 -
+﻿- Add support for private airports (aviation club)
+
+
+Version 1.2 -
 
 - Add support for intercity trains
 - Add support for cable cars
