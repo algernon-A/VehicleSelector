@@ -16,6 +16,7 @@ namespace VehicleSelector
     /// Harmony transpiler to various StartTransfer methods to implement vehicle selection.
     /// </summary>
     [HarmonyPatch]
+    [HarmonyBefore("NoBigTruck")]
     public static class WarehouseStartTransferPatch
     {
         /// <summary>
