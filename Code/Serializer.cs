@@ -5,6 +5,7 @@
 
 namespace VehicleSelector
 {
+    using System;
     using System.IO;
     using AlgernonCommons;
     using ICities;
@@ -86,41 +87,48 @@ namespace VehicleSelector
                 Logging.Message("no Vehicle Selector data read");
             }
 
-            // Read data from savegame.
-            data = serializableDataManager.LoadData("TransferController");
-
-            // Check to see if anything was read.
-            if (data != null && data.Length != 0)
+            try
             {
-                // Data was read - go ahead and deserialise.
-                using (MemoryStream stream = new MemoryStream(data))
+                // Try to read Transfer Controller data from savegame.
+                data = serializableDataManager.LoadData("TransferController");
+
+                // Check to see if anything was read.
+                if (data != null && data.Length != 0)
                 {
-                    using (BinaryReader reader = new BinaryReader(stream))
+                    // Data was read - go ahead and deserialise.
+                    using (MemoryStream stream = new MemoryStream(data))
                     {
-                        // Read version.
-                        int version = reader.ReadInt32();
-                        if (version >= 2 && version <= 4)
+                        using (BinaryReader reader = new BinaryReader(stream))
                         {
-                            Logging.Message("found Transfer Controller data version ", version);
+                            // Read version.
+                            int version = reader.ReadInt32();
+                            if (version >= 2 && version <= 4)
+                            {
+                                Logging.Message("found Transfer Controller data version ", version);
 
-                            // Skip TC building settings.
-                            SkipTCBuildings(reader, version);
+                                // Skip TC building settings.
+                                SkipTCBuildings(reader, version);
 
-                            // Skip TC warehouse settings.
-                            SkipTCWarehouses(reader);
+                                // Skip TC warehouse settings.
+                                SkipTCWarehouses(reader);
 
-                            // Deserialize vehicle settings.
-                            VehicleControl.Deserialize(reader);
+                                // Deserialize vehicle settings.
+                                VehicleControl.Deserialize(reader);
 
-                            Logging.Message("read Transfer Controller data ", stream.Length);
+                                Logging.Message("read Transfer Controller data ", stream.Length);
+                            }
                         }
                     }
                 }
+                else
+                {
+                    // No data read.
+                    Logging.Message("no Transfer Controller data read");
+                }
             }
-            else
+            catch (Exception e)
             {
-                // No data read.
-                Logging.Message("no Transfer Controller data read");
+                Logging.LogException(e, "exception reading Transfer Controller data");
             }
         }
 

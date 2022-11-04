@@ -1,6 +1,7 @@
 ﻿- Add support for private airports (aviation club)
 - Defer to Transport Lines Manager for intercity passenger vehicles (passenger trains, buses, aircraft) if TLM is present
 - Ensure priority over NoBigTruck patches
+- Add exception handling in case of corrupted Transfer Controller vehicle data
 
 
 Version 1.2 -
