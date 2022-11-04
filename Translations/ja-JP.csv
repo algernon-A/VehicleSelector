@@ -31,6 +31,7 @@
 "FISH_BOAT","漁船","Vehicle selection title - fishing boats."
 "AIR_PASSENGER","旅客飛行機","Vehicle selection title - passenger planes."
 "AIR_CARGO","貨物飛行機","Vehicle selection title - cargo planes."
+"AIR_LIGHT","軽飛行機","Vehicle selection title - light aircraft (aviation club)."
 "SHIP_PASSENGER","旅客船","Vehicle selection title - passenger ships."
 "SHIP_CARGO","貨物船","Vehicle selection title - cargo ships."
 "BUS_INTERCITY","都市間バス","Vehicle selection title - intercity buses."
@@ -56,3 +57,4 @@
 "ZOOM_BUILDING","建物を拡大","Tooltop for 'zoom to selected building' button."
 "NO_DISTRICT","地区がありません","Displayed when selected building has no district."
 "ANY_VEHICLE","任意の車両","Displayed when no specific vehicle is selected."
+"TLM_DISABLE","Transport Lines Managerが有効なため、この建物ではVehicle Selectorが無効化しています。 Transport Lines Managerを使用して、建物の車両を設定します。","Button tooltip when button is disabled because the TLM mod is active."
