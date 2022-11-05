@@ -102,9 +102,13 @@ namespace VehicleSelector
                 return;
             }
 
-            // Local references.
+            // Local reference.
             Building[] buildingBuffer = Singleton<BuildingManager>.instance.m_buildings.m_buffer;
+
+            // Generated lists.
             List<VehicleItem> items = new List<VehicleItem>();
+            List<VehicleInfo> trailers = new List<VehicleInfo>();
+            List<VehicleInfo> locomotives = new List<VehicleInfo>();
 
             // Determine effective building class for vehicle matching.
             VehicleControl.GetEffectiveClass(currentBuilding, buildingBuffer, ParentPanel.TransferReason, out ItemClass.Service buildingService, out ItemClass.SubService buildingSubService, out ItemClass.Level buildingLevel);
@@ -170,8 +174,28 @@ namespace VehicleSelector
 
                         // All filters passed - add to available list.
                         items.Add(new VehicleItem(vehicle));
+
+                        // Record any trailers.
+                        if (vehicle.m_trailers != null && vehicle.m_trailers.Length > 0)
+                        {
+                            // Any vehicle that has trailers is a locomotive - record it to ensure that we don't accidentally remove it later (trailing driving vehicles).
+                            locomotives.Add(vehicle);
+
+                            // Record all trailers.
+                            foreach (VehicleInfo.VehicleTrailer trailer in vehicle.m_trailers)
+                            {
+                                trailers.Add(trailer.m_info);
+                            }
+                        }
                     }
                 }
+            }
+
+            // Remove any trailers from list.
+            foreach (VehicleInfo trailer in trailers)
+            {
+                // Exempt any recorded locomotives from removal.
+                items.Remove(items.Find(x => x.Info == trailer && !locomotives.Contains(trailer)));
             }
 
             // Set display list items, without changing the display.

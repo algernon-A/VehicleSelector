@@ -1,4 +1,7 @@
-﻿Version 1.3 -
+﻿- Improve trailer detection when collating vehicle lists
+
+
+Version 1.3 -
 
 - Add support for private airports (aviation club)
 - Defer to Transport Lines Manager for intercity passenger vehicles (passenger trains, buses, ships, aircraft) if TLM is present
