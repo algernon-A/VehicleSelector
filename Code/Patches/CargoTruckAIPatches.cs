@@ -16,7 +16,7 @@ namespace VehicleSelector.Code.Patches
     /// Harmony patches for CargoTruckAI to (surprisingly) implement custom cargo train selection.
     /// </summary>
     [HarmonyPatch(typeof(CargoTruckAI))]
-    [HarmonyBefore("NoBigTruck")]
+    [HarmonyBefore("NoBigTruck", "github.com/bloodypenguin/Skylines-CargoFerries")]
     internal static class CargoTruckAIPatches
     {
         /// <summary>
