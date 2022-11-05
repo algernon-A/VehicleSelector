@@ -57,6 +57,9 @@ namespace VehicleSelector
         private readonly TransferStruct[] _transfers = new TransferStruct[MaxTransfers];
         private readonly VehicleSelection[] _vehicleSelections = new VehicleSelection[MaxTransfers];
 
+        // Status flag.
+        private readonly bool _panelReady = false;
+
         // Current selections.
         private ushort _currentBuilding;
         private int _numSelections;
@@ -65,7 +68,6 @@ namespace VehicleSelector
         private byte _currentPark;
 
         // Event handling.
-        private bool _panelReady = false;
         private bool _copyProcessing = false;
         private bool _pasteProcessing = false;
 
@@ -378,6 +380,21 @@ namespace VehicleSelector
             if (absolutePosition.y + height > Screen.height - 120)
             {
                 absolutePosition = new Vector2(absolutePosition.x, Screen.height - 120 - height);
+            }
+
+            if (absolutePosition.x + width > Screen.width - 20)
+            {
+                absolutePosition = new Vector2(Screen.width - 20 - width, absolutePosition.y);
+            }
+
+            if (absolutePosition.y < 20f)
+            {
+                absolutePosition = new Vector2(absolutePosition.x, 20f);
+            }
+
+            if (absolutePosition.x < 20f)
+            {
+                absolutePosition = new Vector2(20f, absolutePosition.y);
             }
 
             // Update button states.

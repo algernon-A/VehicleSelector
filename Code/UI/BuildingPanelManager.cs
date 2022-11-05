@@ -34,8 +34,7 @@ namespace VehicleSelector
         /// Creates the panel object in-game and displays it.
         /// </summary>
         /// <typeparam name="TPanel">Panel type.</typeparam>
-        internal static void Create<TPanel>()
-            where TPanel : BuildingPanel
+        internal static void Create()
         {
             try
             {
@@ -47,7 +46,7 @@ namespace VehicleSelector
                     s_gameObject.transform.parent = UIView.GetAView().transform;
 
                     // Add panel and set parent transform.
-                    s_panel = s_gameObject.AddComponent<TPanel>();
+                    s_panel = s_gameObject.AddComponent<BuildingPanel>();
 
                     // Show panel.
                     Panel.Show();
@@ -83,7 +82,7 @@ namespace VehicleSelector
             // If no existing panel, create it.
             if (Panel == null)
             {
-                Create<BuildingPanel>();
+                Create();
             }
 
             // Set the target.
