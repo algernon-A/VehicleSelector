@@ -3,12 +3,13 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
 
-namespace VehicleSelector.Code.Patches
+namespace VehicleSelector
 {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Reflection.Emit;
+    using AlgernonCommons;
     using ColossalFramework.Math;
     using HarmonyLib;
 
@@ -19,6 +20,21 @@ namespace VehicleSelector.Code.Patches
     [HarmonyBefore("NoBigTruck", "github.com/bloodypenguin/Skylines-CargoFerries")]
     internal static class CargoTruckAIPatches
     {
+        // Barges mod GetRandomVehicleInfo delegate.
+        private static BargesVehicleDelegate s_bargesVehicleDelegate;
+
+        /// <summary>
+        /// Delegate to Barges mod's custom GetRandomVehicleInfo method.
+        /// </summary>
+        /// <param name="instance">VehicleManager instance.</param>
+        /// <param name="cargoStation1">Source cargo station.</param>
+        /// <param name="cargoStation2">Destination cargo station.</param>
+        /// <param name="service">Transfer service.</param>
+        /// <param name="subService">Transfer sub-service.</param>
+        /// <param name="level">Transfer level.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        private delegate VehicleInfo BargesVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
+
         /// <summary>
         /// Harmony transpiler for CargoTruckAI.ChangeVehicleType, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
         /// </summary>
@@ -84,6 +100,13 @@ namespace VehicleSelector.Code.Patches
             if (vehicleList == null)
             {
                 // No custom vehicle selection - use game method.
+
+                // Insert check for barges mod.
+                if (s_bargesVehicleDelegate != null)
+                {
+                    return s_bargesVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
+                }
+
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
 
@@ -91,6 +114,29 @@ namespace VehicleSelector.Code.Patches
             int i = r.Int32((uint)vehicleList.Count);
             {
                 return vehicleList[i];
+            }
+        }
+
+        /// <summary>
+        /// Checks for the Barges mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckMods()
+        {
+            try
+            {
+                Assembly barges = AssemblyUtils.GetEnabledAssembly("CargoFerries");
+                if (barges != null)
+                {
+                    s_bargesVehicleDelegate = AccessTools.MethodDelegate<BargesVehicleDelegate>(AccessTools.Method(barges.GetType("CargoFerries.HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch"), "GetCargoVehicleInfo"));
+                    if (s_bargesVehicleDelegate != null)
+                    {
+                        Logging.Message("got delegate to barges mod");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from barges mod");
             }
         }
     }

@@ -2,6 +2,7 @@
 
 - Improve trailer detection when collating vehicle lists
 - Add check to ensure building panel doesn't overflow any screen boundary when opening
+- Resolve conflict with Barges mod
 
 
 Version 1.3 -
