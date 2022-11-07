@@ -15,12 +15,27 @@ namespace VehicleSelector
 
     /// <summary>
     /// Harmony patches to TransportStationAI to implement vehicle selection.
-    /// Runs after Transport Lines Manager, effictively meaning that TLM takes precedence if installed.
+    /// Runs before Transport Lines Manager, pre-empting TLM patching.
     /// </summary>
     [HarmonyPatch(typeof(TransportStationAI))]
-    [HarmonyAfter("com.klyte.redirectors.TLM")]
+    [HarmonyBefore("com.klyte.redirectors.TLM")]
     public static class TransportStationAIPatches
     {
+        // TLM mod TryGetRandomVehicle delegate.
+        private static TLMVehicleDelegate s_tlmVehicleDelegate;
+
+        /// <summary>
+        /// Delegate to Transport Line Manager mod's custom GetRandomVehicleInfo method for TransportStationAI.
+        /// </summary>
+        /// <param name="vm">VehicleManager instance.</param>
+        /// <param name="r">Randomizer instance.</param>
+        /// <param name="service">Transfer service.</param>
+        /// <param name="subService">Transfer sub-service.</param>
+        /// <param name="level">Transfer level.</param>
+        /// <param name="type">Transfer vehicle type.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        private delegate VehicleInfo TLMVehicleDelegate(VehicleManager vm, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type);
+
         /// <summary>
         /// Harmony transpiler for TransportStationAI.CreateIncomingVehicle, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
         /// </summary>
@@ -40,6 +55,29 @@ namespace VehicleSelector
         [HarmonyPatch("CreateOutgoingVehicle")]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> CreateOutgoingVehicleTranspiler(IEnumerable<CodeInstruction> instructions, MethodBase original) => TransportStationTranspiler(instructions, original);
+
+        /// <summary>
+        /// Checks for the Transport Lines Manager mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckMods()
+        {
+            try
+            {
+                Assembly tlm = AssemblyUtils.GetEnabledAssembly("TransportLinesManager");
+                if (tlm != null)
+                {
+                    s_tlmVehicleDelegate = AccessTools.MethodDelegate<TLMVehicleDelegate>(AccessTools.Method(tlm.GetType("Klyte.TransportLinesManager.Overrides.OutsideConnectionOverrides"), "TryGetRandomVehicleStation"));
+                    if (s_tlmVehicleDelegate != null)
+                    {
+                        Logging.Message("got delegate to TLM");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from TLM");
+            }
+        }
 
         /// <summary>
         /// Harmony transpiler to replace existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
@@ -100,6 +138,13 @@ namespace VehicleSelector
             if (vehicleList == null)
             {
                 // No custom vehicle selection - use game method.
+
+                // Insert check for TLM.
+                if (s_tlmVehicleDelegate != null)
+                {
+                    return s_tlmVehicleDelegate.Invoke(vehicleManager, ref r, service, subService, level, type);
+                }
+
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level, type);
             }
 

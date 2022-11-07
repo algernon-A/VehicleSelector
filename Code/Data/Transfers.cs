@@ -19,22 +19,13 @@ namespace VehicleSelector
         internal const int MaxTransfers = 3;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
-        /// </summary>
-        internal static bool TLMActive { get; set; } = false;
-
-        /// <summary>
         /// Checks if the given building has supported transfer types.
         /// </summary>
         /// <param name="buildingID">ID of building to check.</param>
-        /// <param name="tlmDisabled">Set to true if the button should be disabled due to TLM being present.</param>
         /// <returns>True if any transfers are supported for this building, false if none.</returns>
-        internal static bool BuildingEligibility(ushort buildingID, out bool tlmDisabled)
+        internal static bool BuildingEligibility(ushort buildingID)
         {
             BuildingInfo buildingInfo = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info;
-
-            // Check for TLM override.
-            tlmDisabled = TLMActive && buildingInfo.m_buildingAI is TransportStationAI;
 
             // Check eligigibility.
             return BuildingEligibility(buildingID, buildingInfo, new TransferStruct[MaxTransfers]) > 0;

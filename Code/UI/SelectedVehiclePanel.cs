@@ -9,6 +9,7 @@ namespace VehicleSelector
     using System.Linq;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
+    using ColossalFramework;
     using ColossalFramework.UI;
     using UnityEngine;
 
@@ -19,6 +20,12 @@ namespace VehicleSelector
     {
         // Panel to display when no item is selected.
         private readonly UIPanel _randomPanel;
+        private readonly UILabel _randomLabel;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
+        /// </summary>
+        internal static bool TLMActive { get; set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectedVehiclePanel"/> class.
@@ -37,14 +44,12 @@ namespace VehicleSelector
             randomSprite.spriteName = "Random";
 
             // Label.
-            UILabel randomLabel = randomSprite.AddUIComponent<UILabel>();
-            randomLabel.textScale = 0.8f;
-            randomLabel.text = Translations.Translate("ANY_VEHICLE");
+            _randomLabel = UILabels.AddLabel(_randomPanel, 0f, 0f, Translations.Translate("ANY_VEHICLE"), VehicleList.width, 0.8f);
 
             // Size is 56x33, so offset -8 from left and 3.5 from top to match normal row sizing.
             randomSprite.size = new Vector2(56f, 33f);
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
-            randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - randomLabel.height) / 2f);
+            _randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - _randomLabel.height) / 2f);
         }
 
         /// <summary>
@@ -68,7 +73,17 @@ namespace VehicleSelector
             }
 
             // If list is empty, show random item panel (and hide otherwise).
-            _randomPanel.isVisible = items.Count == 0;
+            if (items.Count == 0)
+            {
+                _randomPanel.Show();
+
+                // Check for TLM override.
+                _randomLabel.text =Translations.Translate(TLMActive && Singleton<BuildingManager>.instance.m_buildings.m_buffer[ParentPanel.ParentPanel.CurrentBuilding].Info.m_buildingAI is TransportStationAI ? "TLM_VEHICLE" : "ANY_VEHICLE");
+            }
+            else
+            {
+                _randomPanel.Hide();
+            }
 
             // Set display list items, without changing the display.
             VehicleList.Data = new FastList<object>

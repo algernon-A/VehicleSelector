@@ -23,6 +23,9 @@ namespace VehicleSelector
         {
             base.CreatedActions(loading);
 
+            // Check for TLM.
+            TransportStationAIPatches.CheckMods();
+
             // Check for barges mod.
             CargoTruckAIPatches.CheckMods();
         }
@@ -39,7 +42,7 @@ namespace VehicleSelector
             BuildingPanelManager.AddInfoPanelButtons();
 
             // Set TLM active flag if Transfer Lines Manager is present.
-            Transfers.TLMActive = AssemblyUtils.GetEnabledAssembly("TransportLinesManager") != null;
+            SelectedVehiclePanel.TLMActive = AssemblyUtils.GetEnabledAssembly("TransportLinesManager") != null;
         }
     }
 }

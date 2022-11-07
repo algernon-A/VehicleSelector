@@ -33,7 +33,6 @@ namespace VehicleSelector
         /// <summary>
         /// Creates the panel object in-game and displays it.
         /// </summary>
-        /// <typeparam name="TPanel">Panel type.</typeparam>
         internal static void Create()
         {
             try
@@ -113,11 +112,9 @@ namespace VehicleSelector
         internal static void TargetChanged()
         {
             ushort buildingID = WorldInfoPanel.GetCurrentInstanceID().Building;
-            bool supportedBuilding = Transfers.BuildingEligibility(buildingID, out bool tlmDisabled);
+            bool supportedBuilding = Transfers.BuildingEligibility(buildingID);
             s_privateBuildingButton.isVisible = supportedBuilding;
             s_playerBuildingButton.isVisible = supportedBuilding;
-            s_playerBuildingButton.isEnabled = !tlmDisabled;
-            s_playerBuildingButton.tooltip = Translations.Translate(tlmDisabled ? "TLM_DISABLE" : "MOD_NAME");
 
             // Don't do anything if panel isn't open.
             if (s_panel != null)
@@ -223,6 +220,7 @@ namespace VehicleSelector
             buttonSprite.atlas = UITextures.LoadSingleSpriteAtlas("VS-Icon");
             buttonSprite.relativePosition = new Vector2(1f, 1f);
             buttonSprite.spriteName = "normal";
+            buttonSprite.tooltip = Translations.Translate("MOD_NAME");
 
             // Set position.
             panelButton.relativePosition = new Vector2(relativeX, relativeY);
