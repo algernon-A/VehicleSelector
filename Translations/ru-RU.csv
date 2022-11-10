@@ -57,4 +57,4 @@
 "ZOOM_BUILDING","Перейти к зданию","Tooltop for 'zoom to selected building' button."
 "NO_DISTRICT","Район отсутствует","Displayed when selected building has no district."
 "ANY_VEHICLE","Любой транспорт","Displayed when no specific vehicle is selected."
-"TLM_DISABLE","Vehicle Selector отключён для этого здания, потому что активен мод Transport Lines Manager.  Используйте Transport Lines Manager, чтобы настроить транспорт для этого здания.","Button tooltip when button is disabled because the TLM mod is active."
+"TLM_VEHICLE","Используется Transport Line Manager","Displayed when no specific vehicle is selected and the Transport Line Manager mod is active."

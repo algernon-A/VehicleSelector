@@ -57,4 +57,4 @@
 "ZOOM_BUILDING","缩放至建筑","Tooltop for 'zoom to selected building' button."
 "NO_DISTRICT","无本地区域","Displayed when selected building has no district."
 "ANY_VEHICLE","任何载具","Displayed when no specific vehicle is selected."
-"TLM_DISABLE","由于 Transport Lines Manager 模组已启用，此建筑物的 Vehicle Selector 模组已被禁用。 使用 Transport Lines Manager 为这座建筑物设置车辆。","Button tooltip when button is disabled because the TLM mod is active."
+"TLM_VEHICLE","使用 Transport Line Manager","Displayed when no specific vehicle is selected and the Transport Line Manager mod is active."
