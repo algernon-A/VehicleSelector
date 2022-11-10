@@ -20,7 +20,6 @@ namespace VehicleSelector
     /// </summary>
     internal class BuildingPanel : UIPanel
     {
-
         /// <summary>
         /// Layout margin.
         /// </summary>

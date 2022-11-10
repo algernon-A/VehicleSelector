@@ -23,11 +23,6 @@ namespace VehicleSelector
         private readonly UILabel _randomLabel;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
-        /// </summary>
-        internal static bool TLMActive { get; set; } = false;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SelectedVehiclePanel"/> class.
         /// </summary>
         internal SelectedVehiclePanel()
@@ -51,6 +46,11 @@ namespace VehicleSelector
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
             _randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - _randomLabel.height) / 2f);
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
+        /// </summary>
+        internal static bool TLMActive { get; set; } = false;
 
         /// <summary>
         /// Sets the currently selected vehicle.
@@ -78,7 +78,7 @@ namespace VehicleSelector
                 _randomPanel.Show();
 
                 // Check for TLM override.
-                _randomLabel.text =Translations.Translate(TLMActive && Singleton<BuildingManager>.instance.m_buildings.m_buffer[ParentPanel.ParentPanel.CurrentBuilding].Info.m_buildingAI is TransportStationAI ? "TLM_VEHICLE" : "ANY_VEHICLE");
+                _randomLabel.text = Translations.Translate(TLMActive && Singleton<BuildingManager>.instance.m_buildings.m_buffer[ParentPanel.ParentPanel.CurrentBuilding].Info.m_buildingAI is TransportStationAI ? "TLM_VEHICLE" : "ANY_VEHICLE");
             }
             else
             {
