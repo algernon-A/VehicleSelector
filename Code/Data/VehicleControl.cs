@@ -340,14 +340,19 @@ namespace VehicleSelector
                 // Local reference.
                 List<VehicleInfo> vehicleList = entry.Value;
 
-                // Serialize key.
-                writer.Write(entry.Key);
-
-                // Serialize list (vehicle names).
-                writer.Write((ushort)vehicleList.Count);
-                foreach (VehicleInfo vehicle in vehicleList)
+                // Skip empty entries.
+                if (vehicleList != null && vehicleList.Count > 0)
                 {
-                    writer.Write(vehicle.name);
+                    // Serialize key.
+                    writer.Write(entry.Key);
+
+                    // Serialize list (vehicle names).
+                    writer.Write((ushort)vehicleList.Count);
+                    foreach (VehicleInfo vehicle in vehicleList)
+                    {
+                        // If vehicle is invalid for some reason, just write an empty string (will be ignored on deserialization).
+                        writer.Write(vehicle?.name ?? string.Empty);
+                    }
                 }
 
                 Logging.Message("wrote entry ", entry.Key);

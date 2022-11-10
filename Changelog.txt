@@ -1,6 +1,7 @@
 ﻿Version 1.3.2 -
 
 - Allow active Vehicle Selector settings to take priority over Transport Lines Manager for intercity passenger vehicles (if no vehicles are selected, the mod will continue to defer to TLM)
+- Add checks for invalid data when saving
 
 
 Version 1.3.1 -
