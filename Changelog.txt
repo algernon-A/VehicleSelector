@@ -1,4 +1,7 @@
-﻿Version 1.3.2 -
+﻿- Add extra check to prevent confusion between fishing boats and fish transport
+
+
+Version 1.3.2 -
 
 - Allow active Vehicle Selector settings to take priority over Transport Lines Manager for intercity passenger vehicles (if no vehicles are selected, the mod will continue to defer to TLM)
 - Add checks for invalid data when saving

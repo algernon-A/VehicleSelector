@@ -34,9 +34,12 @@ namespace VehicleSelector
                 {
                     return vehicleList;
                 }
-                else if (material != TransferManager.TransferReason.None)
+
+                // If no entry was found, try again using the 'none' transfer method for any default entries.
+                // Fish are excluded to prevent confusion with fishing boats.
+                if (material != TransferManager.TransferReason.None & material != TransferManager.TransferReason.Fish)
                 {
-                    // No entry found; try again using the default transfer material.
+                    // No entry found; try again using the default transfer material
                     if (AssignedVehicles.TryGetValue(BuildKey(buildingID, TransferManager.TransferReason.None), out vehicleList))
                     {
                         return vehicleList;
