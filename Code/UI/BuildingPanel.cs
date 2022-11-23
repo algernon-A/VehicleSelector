@@ -128,7 +128,7 @@ namespace VehicleSelector
 
                 // Copy/paste buttons.
                 _copyButton = UIButtons.AddIconButton(this, CopyButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Copy"), Translations.Translate("COPY_TIP"));
-                _copyButton.eventClicked += (c, p) => CopyPaste.Copy(_currentBuilding);
+                _copyButton.eventClicked += (c, p) => CopyPaste.Instance.Copy(_currentBuilding);
                 _pasteButton = UIButtons.AddIconButton(this, PasteButtonX, IconButtonY, IconButtonSize, UITextures.LoadQuadSpriteAtlas("VS-Paste"), Translations.Translate("PASTE_TIP"));
                 _pasteButton.eventClicked += (c, p) => Paste();
 
@@ -140,7 +140,7 @@ namespace VehicleSelector
                     IconButtonSize,
                     UITextures.LoadQuadSpriteAtlas("VS-CopyBuilding"),
                     Translations.Translate("COPY_BUILDING_TIP"));
-                _copyBuildingButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, 0, 0);
+                _copyBuildingButton.eventClicked += (c, p) => CopyPaste.Instance.CopyToBuildings(_currentBuilding, 0, 0);
                 _copyDistrictButton = UIButtons.AddIconButton(
                     this,
                     CopyDistrictButtonX,
@@ -148,7 +148,7 @@ namespace VehicleSelector
                     IconButtonSize,
                     UITextures.LoadQuadSpriteAtlas("VS-CopyDistrict"),
                     Translations.Translate("COPY_DISTRICT_TIP"));
-                _copyDistrictButton.eventClicked += (c, p) => CopyPaste.CopyToBuildings(_currentBuilding, _currentDistrict, _currentPark);
+                _copyDistrictButton.eventClicked += (c, p) => CopyPaste.Instance.CopyToBuildings(_currentBuilding, _currentDistrict, _currentPark);
 
                 // Add vehicle panels.
                 for (int i = 0; i < MaxTransfers; ++i)
@@ -199,11 +199,11 @@ namespace VehicleSelector
             {
                 if (!_copyProcessing)
                 {
-                    CopyPaste.Copy(CurrentBuilding);
+                    CopyPaste.Instance.Copy(CurrentBuilding);
                     _copyProcessing = true;
 
                     // Update paste button state.
-                    _pasteButton.isEnabled = CopyPaste.IsValidTarget(CurrentBuilding);
+                    _pasteButton.isEnabled = CopyPaste.Instance.IsValidTarget(CurrentBuilding);
                 }
             }
             else
@@ -397,7 +397,7 @@ namespace VehicleSelector
             }
 
             // Update button states.
-            _pasteButton.isEnabled = CopyPaste.IsValidTarget(CurrentBuilding);
+            _pasteButton.isEnabled = CopyPaste.Instance.IsValidTarget(CurrentBuilding);
             _copyDistrictButton.isEnabled = _currentDistrict != 0 | _currentPark != 0;
 
             // Make sure we're visible if we're not already.
@@ -410,7 +410,7 @@ namespace VehicleSelector
         private void Paste()
         {
             // Paste data.
-            CopyPaste.Paste(CurrentBuilding);
+            CopyPaste.Instance.Paste(CurrentBuilding);
 
             // Update lists.
             foreach (VehicleSelection vehicleSelection in _vehicleSelections)

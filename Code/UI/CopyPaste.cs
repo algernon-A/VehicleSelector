@@ -13,11 +13,14 @@ namespace VehicleSelector
     /// <summary>
     /// Handles copying and pasting of building settings.
     /// </summary>
-    public static class CopyPaste
+    public class CopyPaste
     {
+        // Instance reference.
+        private static CopyPaste s_instance;
+
         // Copy buffer.
-        private static readonly TransferManager.TransferReason[] CopyReasons = new TransferManager.TransferReason[Transfers.MaxTransfers];
-        private static readonly List<VehicleInfo>[] CopyBuffer = new List<VehicleInfo>[Transfers.MaxTransfers]
+        private readonly TransferManager.TransferReason[] _copyReasons = new TransferManager.TransferReason[Transfers.MaxTransfers];
+        private readonly List<VehicleInfo>[] _copyBuffer = new List<VehicleInfo>[Transfers.MaxTransfers]
         {
             new List<VehicleInfo>(),
             new List<VehicleInfo>(),
@@ -25,17 +28,33 @@ namespace VehicleSelector
         };
 
         // Prevent heap allocations every time we copy.
-        private static readonly Transfers.TransferStruct[] TransferBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
+        private readonly Transfers.TransferStruct[] _transferBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
 
         // Copy metadata.
-        private static bool s_isCopied = false;
-        private static int s_bufferSize;
+        private bool _isCopied = false;
+        private int _bufferSize;
+
+        /// <summary>
+        /// Gets the active instance.
+        /// </summary>
+        internal static CopyPaste Instance
+        {
+            get
+            {
+                if (s_instance == null)
+                {
+                    s_instance = new CopyPaste();
+                }
+
+                return s_instance;
+            }
+        }
 
         /// <summary>
         /// Copies vehicle data from the given building to the copy buffer.
         /// </summary>
         /// <param name="buildingID">Source building ID.</param>
-        internal static void Copy(ushort buildingID)
+        internal void Copy(ushort buildingID)
         {
             // Safety check.
             if (buildingID == 0)
@@ -52,29 +71,29 @@ namespace VehicleSelector
             }
 
             // Number of records to copy - make sure there's at least one before proceeding.
-            int length = Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer);
-            s_bufferSize = length;
+            int length = Transfers.BuildingEligibility(buildingID, buildingInfo, _transferBuffer);
+            _bufferSize = length;
 
             // Make sure there's at least one transfer before proceeding.
             if (length > 0)
             {
                 // Clear copied flag (it will be set later if valid data was copied).
-                s_isCopied = false;
+                _isCopied = false;
 
                 // Copy records from source building to buffer.
                 for (int i = 0; i < length; ++i)
                 {
                     // Clear the buffer entry.
-                    CopyBuffer[i].Clear();
+                    _copyBuffer[i].Clear();
 
                     // Try to get vehicle list entry.
-                    List<VehicleInfo> thisList = VehicleControl.GetVehicles(buildingID, TransferBuffer[i].Reason);
+                    List<VehicleInfo> thisList = VehicleControl.GetVehicles(buildingID, _transferBuffer[i].Reason);
                     if (thisList != null && thisList.Count > 0)
                     {
                         // Valid list retrieved - copy it to buffer (don't just copy the list reference, but the content).
-                        CopyBuffer[i].AddRange(thisList);
-                        CopyReasons[i] = TransferBuffer[i].Reason;
-                        s_isCopied = true;
+                        _copyBuffer[i].AddRange(thisList);
+                        _copyReasons[i] = _transferBuffer[i].Reason;
+                        _isCopied = true;
                     }
                 }
             }
@@ -86,7 +105,7 @@ namespace VehicleSelector
         /// <param name="buildingID">Source building ID.</param>
         /// <param name="district">District to limit to (0 for no limit).</param>
         /// <param name="park">Park area to limit to (0 for no limit).</param>
-        internal static void CopyToBuildings(ushort buildingID, byte district, byte park)
+        internal void CopyToBuildings(ushort buildingID, byte district, byte park)
         {
             // Safety check.
             if (buildingID == 0)
@@ -111,7 +130,7 @@ namespace VehicleSelector
             bool restricted = district != 0 | park != 0;
 
             // Number of records to copy - make sure there's at least one before proceeding.
-            int numTransfers = Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer);
+            int numTransfers = Transfers.BuildingEligibility(buildingID, buildingInfo, _transferBuffer);
             Transfers.TransferStruct[] candidateBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
 
             // Make sure there's at least one transfer before proceeding.
@@ -167,7 +186,7 @@ namespace VehicleSelector
                         for (int j = 0; j < numTransfers; ++j)
                         {
                             // Check for reason match.
-                            TransferManager.TransferReason reason = TransferBuffer[j].Reason;
+                            TransferManager.TransferReason reason = _transferBuffer[j].Reason;
                             if (reason == candidateBuffer[j].Reason)
                             {
                                 VehicleControl.PasteVehicles(i, reason, VehicleControl.GetVehicles(buildingID, reason));
@@ -183,10 +202,10 @@ namespace VehicleSelector
         /// </summary>
         /// <param name="buildingID">Source building ID.</param>
         /// <returns>True the building is a valid copy buffer target, false otherwise.</returns>
-        internal static bool IsValidTarget(ushort buildingID)
+        internal bool IsValidTarget(ushort buildingID)
         {
             // Don't do anything if there's no active copy data.
-            if (!s_isCopied || buildingID == 0)
+            if (!_isCopied || buildingID == 0)
             {
                 return false;
             }
@@ -198,13 +217,13 @@ namespace VehicleSelector
             }
 
             // Determine length of target building transfer buffer (smallest of the two buffers).
-            int length = Mathf.Min(s_bufferSize, Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer));
+            int length = Mathf.Min(_bufferSize, Transfers.BuildingEligibility(buildingID, buildingInfo, _transferBuffer));
 
             // Check buffer content variability.
             for (int i = 0; i < length; ++i)
             {
                 // Check for a matching reason.
-                if (TransferBuffer[i].Reason == CopyReasons[i])
+                if (_transferBuffer[i].Reason == _copyReasons[i])
                 {
                     return true;
                 }
@@ -219,10 +238,10 @@ namespace VehicleSelector
         /// </summary>
         /// <param name="buildingID">Source building ID.</param>
         /// <returns>True if copy was successful, false otherwise.</returns>
-        internal static bool Paste(ushort buildingID)
+        internal bool Paste(ushort buildingID)
         {
             // Don't do anything if there's no active copy data.
-            if (!s_isCopied)
+            if (!_isCopied)
             {
                 return false;
             }
@@ -242,19 +261,19 @@ namespace VehicleSelector
             }
 
             // Determine length of target building transfer buffer (smallest of the two buffers).
-            int length = Mathf.Min(s_bufferSize, Transfers.BuildingEligibility(buildingID, buildingInfo, TransferBuffer));
+            int length = Mathf.Min(_bufferSize, Transfers.BuildingEligibility(buildingID, buildingInfo, _transferBuffer));
 
             // All checks passed - copy records from buffer to building.
             for (int i = 0; i < length; ++i)
             {
                 // Skip non-matching reasons.
-                if (TransferBuffer[i].Reason != CopyReasons[i])
+                if (_transferBuffer[i].Reason != _copyReasons[i])
                 {
                     continue;
                 }
 
                 // Paste vehicles.
-                VehicleControl.PasteVehicles(buildingID, CopyReasons[i], CopyBuffer[i]);
+                VehicleControl.PasteVehicles(buildingID, _copyReasons[i], _copyBuffer[i]);
             }
 
             // If we got here, then pasting was successful.
