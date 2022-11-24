@@ -129,50 +129,16 @@ namespace VehicleSelector
             // Determine if any district or park restrictions apply.
             bool restricted = district != 0 | park != 0;
 
-            // Number of records to copy - make sure there's at least one before proceeding.
+            // Number of records to copy - make sure there's at least one transfer before proceeding.
             int numTransfers = Transfers.BuildingEligibility(buildingID, buildingInfo, _transferBuffer);
-            Transfers.TransferStruct[] candidateBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
-
-            // Make sure there's at least one transfer before proceeding.
             if (numTransfers > 0)
             {
-                // Determine effective building class for vehicle matching.
-                VehicleControl.GetEffectiveClass(
-                    buildingID,
-                    buildingBuffer,
-                    TransferManager.TransferReason.None,
-                    out ItemClass.Service service,
-                    out ItemClass.SubService subService,
-                    out ItemClass.Level level);
-
                 // Copy to all other matching buildings.
                 for (ushort i = 0; i < buildingBuffer.Length; ++i)
                 {
                     // Look for any created buildings with matching service and subservice that aren't this one.
-                    if ((buildingBuffer[i].m_flags & Building.Flags.Created) != 0 && i != buildingID)
+                    if ((buildingBuffer[i].m_flags & Building.Flags.Created) != 0 && i != buildingID && buildingBuffer[i].Info == buildingInfo)
                     {
-                        // Check for matching vehicle selection effective class.
-                        VehicleControl.GetEffectiveClass(
-                            i,
-                            buildingBuffer,
-                            TransferManager.TransferReason.None,
-                            out ItemClass.Service candidateService,
-                            out ItemClass.SubService candidateSubService,
-                            out ItemClass.Level candidateLevel);
-
-                        if (!(candidateService == service
-                            && candidateSubService == subService
-                            && (candidateLevel == level || service == ItemClass.Service.Industrial || service == ItemClass.Service.PlayerIndustry)))
-                        {
-                            continue;
-                        }
-
-                        // Check for matching transfer count.
-                        if (Transfers.BuildingEligibility(i, buildingBuffer[i].Info, candidateBuffer) != numTransfers)
-                        {
-                            continue;
-                        }
-
                         // Apply any district and park restrictions.
                         if (restricted)
                         {
@@ -185,12 +151,8 @@ namespace VehicleSelector
                         // Paste vehicles.
                         for (int j = 0; j < numTransfers; ++j)
                         {
-                            // Check for reason match.
                             TransferManager.TransferReason reason = _transferBuffer[j].Reason;
-                            if (reason == candidateBuffer[j].Reason)
-                            {
-                                VehicleControl.PasteVehicles(i, reason, VehicleControl.GetVehicles(buildingID, reason));
-                            }
+                            VehicleControl.PasteVehicles(i, reason, VehicleControl.GetVehicles(buildingID, reason));
                         }
                     }
                 }

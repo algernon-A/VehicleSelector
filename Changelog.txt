@@ -1,4 +1,7 @@
-﻿Version 1.3.2.2 -
+﻿- Change 'copy to all buildings of this type' behaviour to exact prefab match only
+
+
+Version 1.3.2.2 -
 
 - Fix helicopter depot support
 
