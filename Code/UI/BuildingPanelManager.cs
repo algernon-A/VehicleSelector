@@ -99,6 +99,7 @@ namespace VehicleSelector
                 s_playerBuildingButton = AddInfoPanelButton(UIView.library.Get<CityServiceWorldInfoPanel>(typeof(CityServiceWorldInfoPanel).Name));
                 AddInfoPanelButton(UIView.library.Get<WarehouseWorldInfoPanel>(typeof(WarehouseWorldInfoPanel).Name));
                 AddInfoPanelButton(UIView.library.Get<UniqueFactoryWorldInfoPanel>(typeof(UniqueFactoryWorldInfoPanel).Name));
+                AddInfoPanelButton(UIView.library.Get<ShelterWorldInfoPanel>(typeof(ShelterWorldInfoPanel).Name));
             }
             catch (Exception e)
             {
@@ -153,9 +154,9 @@ namespace VehicleSelector
             {
                 if (infoPanel.Find("ActionPanel") is UIPanel actionPanel)
                 {
-                    Logging.Message("adding info panel button to warehouse");
+                    Logging.Message("adding info panel button to warehouse/shelter");
 
-                    // Warehouse.
+                    // Warehouse or shelter.
                     relativeX = 47f;
                     parent = actionPanel;
                 }

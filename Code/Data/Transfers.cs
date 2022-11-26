@@ -122,6 +122,14 @@ namespace VehicleSelector
                         return 2;
                     }
 
+                    // Shelters.
+                    if (buildingInfo.m_buildingAI is ShelterAI)
+                    {
+                        transfers[0].Title = Translations.Translate("EVACUATION");
+                        transfers[0].Reason = TransferManager.TransferReason.EvacuateA;
+                        return 1;
+                    }
+
                     // No other cases are supported.
                     return 0;
 
