@@ -64,25 +64,36 @@ namespace VehicleSelector
         {
             List<VehicleItem> items = new List<VehicleItem>();
             List<VehicleInfo> buildingVehicles = VehicleControl.GetVehicles(ParentPanel.CurrentBuilding, ParentPanel.TransferReason);
-            if (buildingVehicles != null)
+
+            // Any selected vehicles?
+            if (buildingVehicles != null && buildingVehicles.Count > 0)
             {
+                // Yes - hide random panel.
+                _randomPanel.Hide();
+
+                // Generate filtered display list.
                 foreach (VehicleInfo vehicle in buildingVehicles)
                 {
-                    items.Add(new VehicleItem(vehicle));
+                    // Generate vehicle record for name filtering.
+                    VehicleItem thisItem = new VehicleItem(vehicle);
+
+                    // Apply name filter.
+                    if (!NameFilter(thisItem.Name))
+                    {
+                        continue;
+                    }
+
+                    // Name filter passed - add to available list.
+                    items.Add(thisItem);
                 }
             }
-
-            // If list is empty, show random item panel (and hide otherwise).
-            if (items.Count == 0)
+            else
             {
+                // No selected vehicles available - show random item panel.
                 _randomPanel.Show();
 
                 // Check for TLM override.
                 _randomLabel.text = Translations.Translate(TLMActive && Singleton<BuildingManager>.instance.m_buildings.m_buffer[ParentPanel.ParentPanel.CurrentBuilding].Info.m_buildingAI is TransportStationAI ? "TLM_VEHICLE" : "ANY_VEHICLE");
-            }
-            else
-            {
-                _randomPanel.Hide();
             }
 
             // Set display list items, without changing the display.

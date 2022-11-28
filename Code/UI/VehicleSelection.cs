@@ -42,7 +42,8 @@ namespace VehicleSelector
 
         // Layout constants - private.
         private const float Margin = 5f;
-        private const float VehicleListY = 45f;
+        private const float TitleOffsetY = 40f;
+        private const float VehicleListY = 70f;
         private const float ArrowSize = 32f;
         private const float MidControlX = Margin + ListWidth + Margin;
         private const float RightColumnX = MidControlX + PreviewWidth + Margin;
@@ -131,8 +132,8 @@ namespace VehicleSelector
             _vehicleSelectionPanel.relativePosition = new Vector2(RightColumnX, VehicleListY);
 
             // Vehicle selection list labels.
-            UILabels.AddLabel(_vehicleSelectionPanel.VehicleList, 0f, -15f, Translations.Translate("AVAILABLE_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
-            UILabels.AddLabel(_selectedVehiclePanel.VehicleList, 0f, -15f, Translations.Translate("SELECTED_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_vehicleSelectionPanel.VehicleList, 0f, -TitleOffsetY, Translations.Translate("AVAILABLE_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
+            UILabels.AddLabel(_selectedVehiclePanel.VehicleList, 0f, -TitleOffsetY, Translations.Translate("SELECTED_VEHICLES"), ListWidth, 0.8f, UIHorizontalAlignment.Center);
 
             // Preview panel.
             _previewPanel = AddUIComponent<PreviewPanel>();

@@ -26,7 +26,7 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Gets the building's name (empty string if none).
+        /// Gets the vehicles's name (empty string if none).
         /// </summary>
         public string Name => _vehicleName;
 

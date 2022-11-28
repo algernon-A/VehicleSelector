@@ -12,6 +12,7 @@ namespace VehicleSelector
     using AlgernonCommons.UI;
     using ColossalFramework;
     using ColossalFramework.UI;
+    using UnityEngine;
 
     /// <summary>
     /// Vehicle selection panel main class.
@@ -25,6 +26,9 @@ namespace VehicleSelector
 
         // Vehicle selection list.
         private readonly UIList _vehicleList;
+
+        // Search panel.
+        private readonly UITextField _nameSearch;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VehicleSelectionPanel"/> class.
@@ -51,6 +55,14 @@ namespace VehicleSelector
                     VehicleSelection.VehicleListHeight,
                     VehicleSelectionRow.VehicleRowHeight);
                 _vehicleList.EventSelectionChanged += (c, selectedItem) => SelectedVehicle = (selectedItem as VehicleItem)?.Info;
+
+                // Search field.
+                _nameSearch = UITextFields.AddSmallTextField(_vehicleList, 25f, -23f, VehicleSelection.ListWidth - 25f);
+                _nameSearch.eventTextChanged += (c, text) => PopulateList();
+                UISprite searchSprite = _nameSearch.AddUIComponent<UISprite>();
+                searchSprite.atlas = UITextures.InGameAtlas;
+                searchSprite.spriteName = "LineDetailButtonHovered";
+                searchSprite.relativePosition = new Vector2(-25f, 0f);
             }
             catch (Exception e)
             {
@@ -172,9 +184,6 @@ namespace VehicleSelector
                             }
                         }
 
-                        // All filters passed - add to available list.
-                        items.Add(new VehicleItem(vehicle));
-
                         // Record any trailers.
                         if (vehicle.m_trailers != null && vehicle.m_trailers.Length > 0)
                         {
@@ -187,6 +196,18 @@ namespace VehicleSelector
                                 trailers.Add(trailer.m_info);
                             }
                         }
+
+                        // All filters passed so far - generate vehicle record for name filtering.
+                        VehicleItem thisItem = new VehicleItem(vehicle);
+
+                        // Apply name filter.
+                        if (!NameFilter(thisItem.Name))
+                        {
+                            continue;
+                        }
+
+                        // Name filter passed - add to available list.
+                        items.Add(thisItem);
                     }
                 }
             }
@@ -205,5 +226,12 @@ namespace VehicleSelector
                 m_size = items.Count,
             };
         }
+
+        /// <summary>
+        /// Applies the name text filter to the specified display name.
+        /// </summary>
+        /// <param name="displayName">Vehicle display name.</param>
+        /// <returns>True if the item should be displayed (empty or matching search result), false otherwise.</returns>
+        protected bool NameFilter(string displayName) => _nameSearch.text.IsNullOrWhiteSpace() || displayName.ToLower().Contains(_nameSearch.text.ToLower());
     }
 }

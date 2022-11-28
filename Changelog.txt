@@ -1,4 +1,5 @@
 ﻿- Add support for shelters (evacuation buses)
+- Add name search filter
 
 
 Version 1.3.3 -
