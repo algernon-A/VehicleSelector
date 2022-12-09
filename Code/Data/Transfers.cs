@@ -369,6 +369,13 @@ namespace VehicleSelector
                                 // Cargo harbours.
                                 transfers[0].Title = Translations.Translate("SHIP_CARGO");
                                 transfers[0].Reason = TransferManager.TransferReason.None;
+
+                                // Check for dual-mode.
+                                if (buildingInfo.m_buildingAI is CargoHarborAI cargoHarborAI)
+                                {
+                                    //if (cargoHarborAI.m_transportInfo != null && cargoHarborAI.m_transportInfo.
+                                }
+
                                 return 1;
                             }
 
