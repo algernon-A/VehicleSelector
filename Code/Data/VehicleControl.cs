@@ -37,7 +37,8 @@ namespace VehicleSelector
 
                 // If no entry was found, try again using the 'none' transfer method for any default entries.
                 // Fish are excluded to prevent confusion with fishing boats.
-                if (material != TransferManager.TransferReason.None & material != TransferManager.TransferReason.Fish)
+                // DummyTrain is excluded to prevent confusion with boats for cargo hubs.
+                if (material != TransferManager.TransferReason.None & material != TransferManager.TransferReason.Fish & material != TransferManager.TransferReason.DummyTrain)
                 {
                     // No entry found; try again using the default transfer material
                     if (AssignedVehicles.TryGetValue(BuildKey(buildingID, TransferManager.TransferReason.None), out vehicleList))
@@ -291,6 +292,12 @@ namespace VehicleSelector
                     // Secondary info found - use that instead.
                     effectiveLevel = secondaryClass.m_level;
                 }
+            }
+            else if (originalClass.m_subService == ItemClass.SubService.PublicTransportShip & transferReason == TransferManager.TransferReason.DummyTrain)
+            {
+                // Trains from cargo hubs.
+                effectiveSubService = ItemClass.SubService.PublicTransportTrain;
+                effectiveLevel = ItemClass.Level.Level4;
             }
             else if (transferReason == (TransferManager.TransferReason)120 || transferReason == (TransferManager.TransferReason)121)
             {

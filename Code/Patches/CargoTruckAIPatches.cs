@@ -92,11 +92,24 @@ namespace VehicleSelector
         public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort cargoStationSource, ushort cargoStationDest, BuildingManager buildingManager)
         {
             // Determine transfer direction.
-            BuildingInfo sourceStation = buildingManager.m_buildings.m_buffer[cargoStationSource].Info;
+            Building[] buildings = buildingManager.m_buildings.m_buffer;
+            BuildingInfo sourceStation = buildings[cargoStationSource].Info;
             bool isIncoming = sourceStation?.m_buildingAI is OutsideConnectionAI;
 
+            // Check for cargo hub (ships and trains).
+            TransferManager.TransferReason reason = TransferManager.TransferReason.None;
+            if (subService == ItemClass.SubService.PublicTransportTrain)
+            {
+                BuildingInfo cargoBuilding = isIncoming ? buildings[cargoStationDest].Info : sourceStation;
+                if (cargoBuilding.m_class.m_subService == ItemClass.SubService.PublicTransportShip)
+                {
+                    // We're using DummyTrain to differentiate trains here.
+                    reason = TransferManager.TransferReason.DummyTrain;
+                }
+            }
+
             // Get any custom vehicle list for this building.
-            List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(isIncoming ? cargoStationDest : cargoStationSource, TransferManager.TransferReason.None);
+            List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(isIncoming ? cargoStationDest : cargoStationSource, reason);
             if (vehicleList == null)
             {
                 // No custom vehicle selection - use game method.

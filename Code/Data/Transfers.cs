@@ -373,7 +373,13 @@ namespace VehicleSelector
                                 // Check for dual-mode.
                                 if (buildingInfo.m_buildingAI is CargoHarborAI cargoHarborAI)
                                 {
-                                    //if (cargoHarborAI.m_transportInfo != null && cargoHarborAI.m_transportInfo.
+                                    // Cargo hub.
+                                    if (cargoHarborAI.m_transportInfo != null && cargoHarborAI.m_transportInfo.vehicleCategory == VehicleInfo.VehicleCategory.Trains)
+                                    {
+                                        transfers[1].Title = Translations.Translate("TRAIN_CARGO");
+                                        transfers[1].Reason = TransferManager.TransferReason.DummyTrain;
+                                        return 2;
+                                    }
                                 }
 
                                 return 1;
