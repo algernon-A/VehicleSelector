@@ -2,6 +2,7 @@
 
 - Add train selection to cargo hub
 - Fix water pumping service support
+- Add detailed logging option
 
 
 Version 1.4 -
