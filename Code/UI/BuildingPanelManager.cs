@@ -168,12 +168,12 @@ namespace VehicleSelector
                     relativeX = 18f;
                     parent = miscPanel;
                 }
-                else if (infoPanel.Find("MakeHistoricalPanel") is UIPanel makeHistoricalPanel)
+                else if (infoPanel.Find("ZoneTypeInfo") is UITabContainer zoneTypeInfoPanel)
                 {
                     // Zoned building.
                     Logging.Message("adding info panel button to zoned building");
                     relativeX = 10f;
-                    relativeY = makeHistoricalPanel.relativePosition.y - 47f;
+                    relativeY = zoneTypeInfoPanel.relativePosition.y;
                     parent = infoPanel.component;
                 }
             }
