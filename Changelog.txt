@@ -1,4 +1,7 @@
-﻿Version 1.4.1.1 -
+﻿- Fix helicopter stops being mistakenly tagged as selectable
+
+
+Version 1.4.1.1 -
 
 - Move button on zoned industry panel to top-left to avoid overlap with panel text in some languages
 

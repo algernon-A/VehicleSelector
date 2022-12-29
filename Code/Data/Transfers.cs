@@ -413,8 +413,15 @@ namespace VehicleSelector
                             return 0;
 
                         case ItemClass.SubService.PublicTransportPlane:
-                            if (buildingInfo.m_buildingAI is TransportStationAI)
+                            if (buildingInfo.m_buildingAI is TransportStationAI airTransportStationAI)
                             {
+                                // Passenger aircraft - but exclude helicopters.
+                                TransportInfo transportInfo = airTransportStationAI.m_transportInfo;
+                                if (transportInfo != null && transportInfo.m_transportType == TransportInfo.TransportType.Helicopter)
+                                {
+                                    return 0;
+                                }
+
                                 // Passenger aircraft.
                                 transfers[0].Title = Translations.Translate("AIR_PASSENGER");
                                 transfers[0].Reason = TransferManager.TransferReason.None;
