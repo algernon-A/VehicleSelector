@@ -146,8 +146,6 @@ namespace VehicleSelector
             float relativeX = 0f;
             float relativeY = 0f;
 
-            Logging.Message("adding info panel button  to ", infoPanel.name);
-
             // Player info panels have wrappers, warehouse and zoned ones don't.
             UIComponent wrapper = infoPanel.Find("Wrapper");
             if (wrapper == null)
