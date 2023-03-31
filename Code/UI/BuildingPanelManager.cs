@@ -117,9 +117,10 @@ namespace VehicleSelector
             s_privateBuildingButton.isVisible = supportedBuilding;
             s_playerBuildingButton.isVisible = supportedBuilding;
 
-            // Don't do anything if panel isn't open.
+            // Don't do anything else if panel isn't open.
             if (s_panel != null)
             {
+                // Panel is open - update target, or close if it's an unsupported building.
                 if (supportedBuilding)
                 {
                     SetTarget(buildingID);

@@ -384,6 +384,13 @@ namespace VehicleSelector
 
                                 return 1;
                             }
+                            else if (buildingInfo.m_class.m_level == ItemClass.Level.Level5)
+                            {
+                                // Barges mod.
+                                transfers[0].Title = Translations.Translate("SHIP_CARGO");
+                                transfers[0].Reason = TransferManager.TransferReason.None;
+                                return 1;
+                            }
 
                             // Unsupported ship type.
                             return 0;
