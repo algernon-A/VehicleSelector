@@ -30,6 +30,11 @@ namespace VehicleSelector
         // Prevent heap allocations every time we copy.
         private readonly Transfers.TransferStruct[] _transferBuffer = new Transfers.TransferStruct[Transfers.MaxTransfers];
 
+        // Copy  ItemClass.
+        private ItemClass.Service _copyService = ItemClass.Service.None;
+        private ItemClass.SubService _copySubService = ItemClass.SubService.None;
+        private ItemClass.Level _copyLevel = ItemClass.Level.Level1;
+
         // Copy metadata.
         private bool _isCopied = false;
         private int _bufferSize;
@@ -94,6 +99,11 @@ namespace VehicleSelector
                         _copyBuffer[i].AddRange(thisList);
                         _copyReasons[i] = _transferBuffer[i].Reason;
                         _isCopied = true;
+
+                        // Record ItemClass data.
+                        _copyService = buildingInfo.m_class.m_service;
+                        _copySubService = buildingInfo.m_class.m_subService;
+                        _copyLevel = buildingInfo.m_class.m_level;
                     }
                 }
             }
@@ -160,7 +170,7 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Checks if the given building is a valid target for the current copy buffer..
+        /// Checks if the given building is a valid target for the current copy buffer.
         /// </summary>
         /// <param name="buildingID">Source building ID.</param>
         /// <returns>True the building is a valid copy buffer target, false otherwise.</returns>
@@ -175,6 +185,13 @@ namespace VehicleSelector
             BuildingInfo buildingInfo = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info;
             if (buildingInfo == null)
             {
+                return false;
+            }
+
+            // Check for matching ItemClass.
+            if (buildingInfo.m_class.m_service != _copyService || buildingInfo.m_class.m_subService != _copySubService || buildingInfo.m_class.m_level != _copyLevel)
+            {
+                Logging.Message("ineligible due to ItemClass mismatch");
                 return false;
             }
 
@@ -219,6 +236,12 @@ namespace VehicleSelector
             if (buildingInfo == null)
             {
                 Logging.Error("invalid buildingID passed to CopyPaste.Paste");
+                return false;
+            }
+
+            // Check for eligibility.
+            if (!IsValidTarget(buildingID))
+            {
                 return false;
             }
 

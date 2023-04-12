@@ -246,10 +246,17 @@ namespace VehicleSelector
         /// </summary>
         internal void UpdateButtonStates()
         {
-            _addButton.isEnabled = _selectedListVehicle != null;
-            _addAllButton.isEnabled = _vehicleSelectionPanel.VehicleList.Data.m_size > 0;
-            _removeButton.isEnabled = _selectedBuildingVehicle != null;
-            _removeAllButton.isEnabled = _selectedVehiclePanel.VehicleList.Data.m_size > 0;
+            // Null check.
+            if (_addAllButton != null)
+            {
+                FastList<object> selectionList = _vehicleSelectionPanel?.VehicleList?.Data;
+                FastList<object> selectedList = _selectedVehiclePanel?.VehicleList?.Data;
+
+                _addButton.isEnabled = _selectedListVehicle != null;
+                _addAllButton.isEnabled = selectionList != null && selectionList.m_size > 0;
+                _removeButton.isEnabled = _selectedBuildingVehicle != null;
+                _removeAllButton.isEnabled = selectedList != null && selectedList.m_size > 0;
+            }
         }
 
         /// <summary>
