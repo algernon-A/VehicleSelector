@@ -44,20 +44,20 @@ namespace VehicleSelector
         private const float PanelWidth = VehicleSelection.PanelWidth + Margin + Margin;
 
         // Panel components.
-        private readonly UILabel _buildingLabel;
-        private readonly UILabel _areaLabel1;
-        private readonly UILabel _areaLabel2;
-        private readonly UIButton _copyButton;
-        private readonly UIButton _pasteButton;
-        private readonly UIButton _copyBuildingButton;
-        private readonly UIButton _copyDistrictButton;
+        private UILabel _buildingLabel;
+        private UILabel _areaLabel1;
+        private UILabel _areaLabel2;
+        private UIButton _copyButton;
+        private UIButton _pasteButton;
+        private UIButton _copyBuildingButton;
+        private UIButton _copyDistrictButton;
 
         // Sub-panels.
-        private readonly TransferStruct[] _transfers = new TransferStruct[MaxTransfers];
-        private readonly VehicleSelection[] _vehicleSelections = new VehicleSelection[MaxTransfers];
+        private TransferStruct[] _transfers = new TransferStruct[MaxTransfers];
+        private VehicleSelection[] _vehicleSelections = new VehicleSelection[MaxTransfers];
 
         // Status flag.
-        private readonly bool _panelReady = false;
+        private bool _panelReady = false;
 
         // Current selections.
         private ushort _currentBuilding;
@@ -71,10 +71,28 @@ namespace VehicleSelector
         private bool _pasteProcessing = false;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BuildingPanel"/> class.
+        /// Gets the current building ID.
         /// </summary>
-        internal BuildingPanel()
+        internal ushort CurrentBuilding => _currentBuilding;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this is an incoming (true) or outgoing (false) transfer.
+        /// </summary>
+        internal bool IsIncoming { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current transfer reason.
+        /// </summary>
+        internal TransferManager.TransferReason TransferReason { get; set; }
+
+        /// <summary>
+        /// Called by Unity when the object is created.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Awake()
         {
+            base.Awake();
+
             try
             {
                 // Basic setup.
@@ -166,21 +184,6 @@ namespace VehicleSelector
                 Logging.LogException(e, "exception setting up building panel");
             }
         }
-
-        /// <summary>
-        /// Gets the current building ID.
-        /// </summary>
-        internal ushort CurrentBuilding => _currentBuilding;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this is an incoming (true) or outgoing (false) transfer.
-        /// </summary>
-        internal bool IsIncoming { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current transfer reason.
-        /// </summary>
-        internal TransferManager.TransferReason TransferReason { get; set; }
 
         /// <summary>
         /// Called by Unity every update.

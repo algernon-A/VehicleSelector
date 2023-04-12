@@ -19,14 +19,27 @@ namespace VehicleSelector
     internal class SelectedVehiclePanel : VehicleSelectionPanel
     {
         // Panel to display when no item is selected.
-        private readonly UIPanel _randomPanel;
-        private readonly UILabel _randomLabel;
+        private UIPanel _randomPanel;
+        private UILabel _randomLabel;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelectedVehiclePanel"/> class.
+        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
         /// </summary>
-        internal SelectedVehiclePanel()
+        internal static bool TLMActive { get; set; } = false;
+
+        /// <summary>
+        /// Sets the currently selected vehicle.
+        /// </summary>
+        protected override VehicleInfo SelectedVehicle { set => ParentPanel.SelectedBuildingVehicle = value; }
+
+        /// <summary>
+        /// Called by Unity when the object is created.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Awake()
         {
+            base.Awake();
+
             // Panel setup.
             _randomPanel = VehicleList.AddUIComponent<UIPanel>();
             _randomPanel.width = VehicleList.width;
@@ -46,16 +59,6 @@ namespace VehicleSelector
             randomSprite.relativePosition = new Vector2(-8, (40f - randomSprite.height) / 2f);
             _randomLabel.relativePosition = new Vector2(48f, (randomSprite.height - _randomLabel.height) / 2f);
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the Transport Lines Manager mod is active.
-        /// </summary>
-        internal static bool TLMActive { get; set; } = false;
-
-        /// <summary>
-        /// Sets the currently selected vehicle.
-        /// </summary>
-        protected override VehicleInfo SelectedVehicle { set => ParentPanel.SelectedBuildingVehicle = value; }
 
         /// <summary>
         /// Populates the list.

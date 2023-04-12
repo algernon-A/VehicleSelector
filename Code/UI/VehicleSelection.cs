@@ -49,24 +49,94 @@ namespace VehicleSelector
         private const float RightColumnX = MidControlX + PreviewWidth + Margin;
 
         // Panel components.
-        private readonly UILabel _titleLabel;
-        private readonly UIButton _addButton;
-        private readonly UIButton _removeButton;
-        private readonly UIButton _addAllButton;
-        private readonly UIButton _removeAllButton;
-        private readonly VehicleSelectionPanel _vehicleSelectionPanel;
-        private readonly SelectedVehiclePanel _selectedVehiclePanel;
-        private readonly PreviewPanel _previewPanel;
+        private UILabel _titleLabel;
+        private UIButton _addButton;
+        private UIButton _removeButton;
+        private UIButton _addAllButton;
+        private UIButton _removeAllButton;
+        private VehicleSelectionPanel _vehicleSelectionPanel;
+        private SelectedVehiclePanel _selectedVehiclePanel;
+        private PreviewPanel _previewPanel;
 
         // Currently selected vehicles.
         private VehicleInfo _selectedBuildingVehicle;
         private VehicleInfo _selectedListVehicle;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VehicleSelection"/> class.
+        /// Sets the currently selected vehicle from the list of currently selected vehicles.
         /// </summary>
-        internal VehicleSelection()
+        internal VehicleInfo SelectedBuildingVehicle
         {
+            set
+            {
+                _selectedBuildingVehicle = value;
+
+                if (value != null)
+                {
+                    // Clear other vehicle list selection if this is active.
+                    _vehicleSelectionPanel.ClearSelection();
+                    _previewPanel.SetTarget(value);
+                }
+                else
+                {
+                    // Null value set; clear list selection.
+                    _selectedVehiclePanel.ClearSelection();
+                }
+
+                // Update button states.
+                UpdateButtonStates();
+            }
+        }
+
+        /// <summary>
+        /// Sets the currently selected vehicle from the list of all currently unselected vehicles.
+        /// </summary>
+        internal VehicleInfo SelectedListVehicle
+        {
+            set
+            {
+                _selectedListVehicle = value;
+
+                if (value != null)
+                {
+                    // Clear other vehicle list selection if this is active.
+                    _selectedVehiclePanel.ClearSelection();
+                    _previewPanel.SetTarget(value);
+                }
+                else
+                {
+                    // Null value set; clear list selection.
+                    _vehicleSelectionPanel.ClearSelection();
+                }
+
+                // Update button states.
+                UpdateButtonStates();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the parent tab reference.
+        /// </summary>
+        internal BuildingPanel ParentPanel { get; set; }
+
+        /// <summary>
+        /// Gets the current transfer reason.
+        /// </summary>
+        internal TransferManager.TransferReason TransferReason { get; private set; }
+
+        /// <summary>
+        /// Gets the currently selected building.
+        /// </summary>
+        internal ushort CurrentBuilding { get; private set; }
+
+        /// <summary>
+        /// Called by Unity when the object is created.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Awake()
+        {
+            base.Awake();
+
             // Set size.
             height = PanelHeight;
             width = PanelWidth;
@@ -139,73 +209,6 @@ namespace VehicleSelector
             _previewPanel = AddUIComponent<PreviewPanel>();
             _previewPanel.relativePosition = new Vector2(MidControlX, VehicleListY + ArrowSize + Margin);
         }
-
-        /// <summary>
-        /// Sets the currently selected vehicle from the list of currently selected vehicles.
-        /// </summary>
-        internal VehicleInfo SelectedBuildingVehicle
-        {
-            set
-            {
-                _selectedBuildingVehicle = value;
-
-                if (value != null)
-                {
-                    // Clear other vehicle list selection if this is active.
-                    _vehicleSelectionPanel.ClearSelection();
-                    _previewPanel.SetTarget(value);
-                }
-                else
-                {
-                    // Null value set; clear list selection.
-                    _selectedVehiclePanel.ClearSelection();
-                }
-
-                // Update button states.
-                UpdateButtonStates();
-            }
-        }
-
-        /// <summary>
-        /// Sets the currently selected vehicle from the list of all currently unselected vehicles.
-        /// </summary>
-        internal VehicleInfo SelectedListVehicle
-        {
-            set
-            {
-                _selectedListVehicle = value;
-
-                if (value != null)
-                {
-                    // Clear other vehicle list selection if this is active.
-                    _selectedVehiclePanel.ClearSelection();
-                    _previewPanel.SetTarget(value);
-                }
-                else
-                {
-                    // Null value set; clear list selection.
-                    _vehicleSelectionPanel.ClearSelection();
-                }
-
-                // Update button states.
-                UpdateButtonStates();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the parent tab reference.
-        /// </summary>
-        internal BuildingPanel ParentPanel { get; set; }
-
-        /// <summary>
-        /// Gets the current transfer reason.
-        /// </summary>
-        internal TransferManager.TransferReason TransferReason { get; private set; }
-
-        /// <summary>
-        /// Gets the currently selected building.
-        /// </summary>
-        internal ushort CurrentBuilding { get; private set; }
 
         /// <summary>
         /// Sets/changes the currently selected building.

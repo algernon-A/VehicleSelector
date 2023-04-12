@@ -25,16 +25,34 @@ namespace VehicleSelector
         protected const float Margin = 5f;
 
         // Vehicle selection list.
-        private readonly UIList _vehicleList;
+        private UIList _vehicleList;
 
         // Search panel.
-        private readonly UITextField _nameSearch;
+        private UITextField _nameSearch;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VehicleSelectionPanel"/> class.
+        /// Gets or sets the parent reference.
         /// </summary>
-        internal VehicleSelectionPanel()
+        internal VehicleSelection ParentPanel { get; set; }
+
+        /// <summary>
+        /// Gets the vehicle selection list.
+        /// </summary>
+        internal UIList VehicleList => _vehicleList;
+
+        /// <summary>
+        /// Sets the currently selected vehicle.
+        /// </summary>
+        protected virtual VehicleInfo SelectedVehicle { set => ParentPanel.SelectedListVehicle = value; }
+
+        /// <summary>
+        /// Called by Unity when the object is created.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Awake()
         {
+            base.Awake();
+
             try
             {
                 // Basic setup.
@@ -69,21 +87,6 @@ namespace VehicleSelector
                 Logging.LogException(e, "exception setting up vehicle selection panel");
             }
         }
-
-        /// <summary>
-        /// Gets or sets the parent reference.
-        /// </summary>
-        internal VehicleSelection ParentPanel { get; set; }
-
-        /// <summary>
-        /// Gets the vehicle selection list.
-        /// </summary>
-        internal UIList VehicleList => _vehicleList;
-
-        /// <summary>
-        /// Sets the currently selected vehicle.
-        /// </summary>
-        protected virtual VehicleInfo SelectedVehicle { set => ParentPanel.SelectedListVehicle = value; }
 
         /// <summary>
         /// Clears the current selection.
