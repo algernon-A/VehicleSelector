@@ -298,7 +298,7 @@ namespace VehicleSelector
             _thisBuildingInfo = buildingManager.m_buildings.m_buffer[_currentBuilding].Info;
 
             // Maximum number of panels.
-            _numSelections = Transfers.BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
+            _numSelections = BuildingEligibility(buildingID, _thisBuildingInfo, _transfers);
 
             // Set up used panels.
             int i;
