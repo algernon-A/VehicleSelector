@@ -14,16 +14,16 @@ namespace VehicleSelector
     /// <summary>
     /// The mod's settings options panel.
     /// </summary>
-    public class OptionsPanel : UIPanel
+    public sealed class OptionsPanel : OptionsPanelBase
     {
         // Layout constants.
         private const float Margin = 5f;
         private const float LeftMargin = 24f;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OptionsPanel"/> class.
+        /// Performs on-demand panel setup.
         /// </summary>
-        internal OptionsPanel()
+        protected override void Setup()
         {
             // Add controls.
             // Y position indicator.
