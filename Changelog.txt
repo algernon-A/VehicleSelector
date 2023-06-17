@@ -1,4 +1,5 @@
 ﻿- Update AlgernonCommons
+- Update bundled CitiesHarmony
 
 
 Version 1.4.2 -
