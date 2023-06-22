@@ -1,12 +1,10 @@
-﻿- Update AlgernonCommons
-- Update bundled CitiesHarmony
+﻿Version 1.4.2 -
 
-
-Version 1.4.2 -
-
+- Compatibility with game version 1.17.1-f4
 - Add support for Barges mod
 - Add ItemClass level checks to copy-paste
 - Update AlgernonCommons
+- Update bundled CitiesHarmony
 
 
 Version 1.4.1.3 -
