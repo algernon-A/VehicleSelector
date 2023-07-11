@@ -152,6 +152,14 @@ namespace VehicleSelector
 
                         return 1;
                     }
+                    else if (buildingInfo.m_buildingAI is BankOfficeAI)
+                    {
+                        // Banks.
+                        transfers[0].Title = Translations.Translate("BANK_TRUCK");
+                        transfers[0].Reason = TransferManager.TransferReason.Cash;
+
+                        return 1;
+                    }
                     else
                     {
                         // Prisons.
