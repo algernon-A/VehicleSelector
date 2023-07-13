@@ -171,13 +171,19 @@ namespace VehicleSelector
                             }
 
                             // Check to separate disaster helicopters and trucks.
-                            if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed)
+                            else if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed)
                             {
                                 vehicleType = VehicleInfo.VehicleType.Car;
                             }
                             else if (ParentPanel.TransferReason == TransferManager.TransferReason.Collapsed2)
                             {
                                 vehicleType = VehicleInfo.VehicleType.Helicopter;
+                            }
+
+                            // Check to include fishing boats.
+                            else if (buildingService == ItemClass.Service.Fishing && ParentPanel.TransferReason == TransferManager.TransferReason.None)
+                            {
+                                vehicleType = VehicleInfo.VehicleType.Ship;
                             }
 
                             // Check vehicle type.

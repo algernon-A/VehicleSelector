@@ -1,4 +1,5 @@
 ﻿- Add support for bank vans
+- Fix fishing boats not being selectable
 
 
 Version 1.4.2 -
