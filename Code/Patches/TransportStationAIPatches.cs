@@ -10,6 +10,7 @@ namespace VehicleSelector
     using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
+    using AlgernonCommons.Patching;
     using ColossalFramework.Math;
     using HarmonyLib;
 
@@ -18,11 +19,14 @@ namespace VehicleSelector
     /// Runs before Transport Lines Manager, pre-empting TLM patching.
     /// </summary>
     [HarmonyPatch(typeof(TransportStationAI))]
-    [HarmonyBefore("com.klyte.redirectors.TLM")]
+    [HarmonyBefore("com.klyte.redirectors.TLM", "com.redirectors.TLM")]
     public static class TransportStationAIPatches
     {
         // TLM mod TryGetRandomVehicle delegate.
         private static TLMVehicleDelegate s_tlmVehicleDelegate;
+
+        // TLM mod TryGetRandomVehicleStation method.
+        private static MethodInfo s_tlmTryGetRandomVehicleStation;
 
         /// <summary>
         /// Delegate to Transport Line Manager mod's custom GetRandomVehicleInfo method for TransportStationAI.
@@ -57,7 +61,7 @@ namespace VehicleSelector
         public static IEnumerable<CodeInstruction> CreateOutgoingVehicleTranspiler(IEnumerable<CodeInstruction> instructions, MethodBase original) => TransportStationTranspiler(instructions, original);
 
         /// <summary>
-        /// Checks for the Transport Lines Manager mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// Checks for the Transport Lines Manager mod, and if found, creates the delegate to its custom method for TryGetRandomVehicleStation.
         /// </summary>
         internal static void CheckMods()
         {
@@ -66,10 +70,36 @@ namespace VehicleSelector
                 Assembly tlm = AssemblyUtils.GetEnabledAssembly("TransportLinesManager");
                 if (tlm != null)
                 {
-                    s_tlmVehicleDelegate = AccessTools.MethodDelegate<TLMVehicleDelegate>(AccessTools.Method(tlm.GetType("Klyte.TransportLinesManager.Overrides.OutsideConnectionOverrides"), "TryGetRandomVehicleStation"));
-                    if (s_tlmVehicleDelegate != null)
+                    Logging.Message("found TransportLinesManager assembly");
+
+                    MethodInfo tlmMethod = AccessTools.Method(tlm.GetType("Klyte.TransportLinesManager.Overrides.OutsideConnectionOverrides"), "TryGetRandomVehicleStation");
+
+                    if (tlmMethod == null)
                     {
-                        Logging.Message("got delegate to TLM");
+                        Logging.Message("using new TransportLinesManager");
+                        tlmMethod = AccessTools.Method(tlm.GetType("TransportLinesManager.Overrides.TransportStationAIOverrides"), "TryGetRandomVehicleStation");
+
+                        // Get random station method.
+                        s_tlmTryGetRandomVehicleStation = AccessTools.Method(Type.GetType("TransportLinesManager.Overrides.TransportStationAIOverrides,TransportLinesManager"), "TryGetRandomVehicleStation");
+
+                        // Transpile new TLM methods.
+                        if (s_tlmTryGetRandomVehicleStation != null)
+                        {
+                            MethodInfo tlmCreateVehicle = AccessTools.Method(tlm.GetType("TransportLinesManager.Overrides.TransportStationAIOverrides"), "CreateIncomingVehicle");
+                            PatcherManager<PatcherBase>.Instance.TranspileMethod(tlmCreateVehicle, AccessTools.Method(typeof(TransportStationAIPatches), nameof(TransportStationTranspiler)));
+
+                            tlmCreateVehicle = AccessTools.Method(tlm.GetType("TransportLinesManager.Overrides.TransportStationAIOverrides"), "CreateOutgoingVehicle");
+                            PatcherManager<PatcherBase>.Instance.TranspileMethod(tlmCreateVehicle, AccessTools.Method(typeof(TransportStationAIPatches), nameof(TransportStationTranspiler)));
+                        }
+                    }
+
+                    if (tlmMethod != null)
+                    {
+                        s_tlmVehicleDelegate = AccessTools.MethodDelegate<TLMVehicleDelegate>(tlmMethod);
+                        if (s_tlmVehicleDelegate != null)
+                        {
+                            Logging.Message("got delegate to TLM");
+                        }
                     }
                 }
             }
@@ -102,16 +132,13 @@ namespace VehicleSelector
                 // Get next instruction.
                 CodeInstruction instruction = instructionsEnumerator.Current;
 
-                // If this instruction calls the GetPrimaryRandomVehicleInfo method, then replace it with a call to our custom method.
-                if (instruction.opcode == OpCodes.Callvirt)
+                // If this instruction calls the GetPrimaryRandomVehicleInfo method, or the TLM target method, then replace it with a call to our custom method.
+                if (instruction.Calls(getRandomVehicleType) || (s_tlmTryGetRandomVehicleStation != null && instruction.Calls(s_tlmTryGetRandomVehicleStation)))
                 {
-                    if (instruction.Calls(getRandomVehicleType))
-                    {
-                        // Add buildingID and material params to call.
-                        yield return new CodeInstruction(OpCodes.Ldarg_1);
-                        instruction = new CodeInstruction(OpCodes.Call, chooseVehicleType);
-                        Logging.Message("transpiled");
-                    }
+                    // Add buildingID and material params to call.
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
+                    instruction = new CodeInstruction(OpCodes.Call, chooseVehicleType);
+                    Logging.Message("transpiled");
                 }
 
                 // Output this instruction.

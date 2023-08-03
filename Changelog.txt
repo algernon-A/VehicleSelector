@@ -1,4 +1,7 @@
-﻿Version 1.4.3 -
+﻿- Add partial compatibility with Transport Lines Manager 14.5
+
+
+Version 1.4.3 -
 
 - Add support for bank vans
 - Fix fishing boats not being selectable
