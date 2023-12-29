@@ -442,7 +442,7 @@ namespace VehicleSelector
                                 transfers[0].Reason = TransferManager.TransferReason.None;
                                 return 1;
                             }
-                            else if (buildingInfo.m_buildingAI is CargoStationAI)
+                            else if (buildingInfo.m_buildingAI is CargoStationAI || buildingInfo.m_class.m_level == ItemClass.Level.Level5)
                             {
                                 // Cargo aircraft.
                                 transfers[0].Title = Translations.Translate("AIR_CARGO");

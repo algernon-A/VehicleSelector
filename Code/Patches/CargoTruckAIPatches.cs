@@ -23,6 +23,9 @@ namespace VehicleSelector
         // Barges mod GetRandomVehicleInfo delegate.
         private static BargesVehicleDelegate s_bargesVehicleDelegate;
 
+        // AFT mod GetRandomVehicleInfo delegate.
+        private static AFTVehicleDelegate s_aftVehicleDelegate;
+
         /// <summary>
         /// Delegate to Barges mod's custom GetRandomVehicleInfo method.
         /// </summary>
@@ -34,6 +37,18 @@ namespace VehicleSelector
         /// <param name="level">Transfer level.</param>
         /// <returns>Selected VehicleInfo for spawning.</returns>
         private delegate VehicleInfo BargesVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
+
+        /// <summary>
+        /// Delegate to AFT mod's custom GetRandomVehicleInfo method.
+        /// </summary>
+        /// <param name="instance">VehicleManager instance.</param>
+        /// <param name="cargoStation1">Source cargo station.</param>
+        /// <param name="cargoStation2">Destination cargo station.</param>
+        /// <param name="service">Transfer service.</param>
+        /// <param name="subService">Transfer sub-service.</param>
+        /// <param name="level">Transfer level.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        private delegate VehicleInfo AFTVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
 
         /// <summary>
         /// Harmony transpiler for CargoTruckAI.ChangeVehicleType, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
@@ -120,6 +135,11 @@ namespace VehicleSelector
                     return s_bargesVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
                 }
 
+                if (s_aftVehicleDelegate != null)
+                {
+                    return s_aftVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
+                }
+
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
 
@@ -146,10 +166,20 @@ namespace VehicleSelector
                         Logging.Message("got delegate to barges mod");
                     }
                 }
+
+                Assembly aft = AssemblyUtils.GetEnabledAssembly("AdditionalFreightTransporters");
+                if (aft != null)
+                {
+                    s_aftVehicleDelegate = AccessTools.MethodDelegate<AFTVehicleDelegate>(AccessTools.Method(barges.GetType("AdditionalFreightTransporters.HarmonyPatches.CargoTruckAIPatch"), "GetCargoVehicleInfo"));
+                    if (s_aftVehicleDelegate != null)
+                    {
+                        Logging.Message("got delegate to aft mod");
+                    }
+                }
             }
             catch (Exception e)
             {
-                Logging.LogException(e, "exception getting delegate from barges mod");
+                Logging.LogException(e, "exception getting delegate from barges mod or aft mod");
             }
         }
     }
