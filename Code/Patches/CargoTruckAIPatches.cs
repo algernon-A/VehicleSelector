@@ -135,6 +135,7 @@ namespace VehicleSelector
                     return s_bargesVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
                 }
 
+                // Insert check for aft mod.
                 if (s_aftVehicleDelegate != null)
                 {
                     return s_aftVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
@@ -150,6 +151,9 @@ namespace VehicleSelector
             }
         }
 
+        /// <summary>
+        /// Checks for the Barges mod or AFT mod, and if one is found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
         internal static void CheckMods()
         {
             CheckBargesMod();
