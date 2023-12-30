@@ -430,9 +430,9 @@ namespace VehicleSelector
                         case ItemClass.SubService.PublicTransportPlane:
                             if (buildingInfo.m_buildingAI is TransportStationAI airTransportStationAI)
                             {
-                                // Passenger aircraft - but exclude helicopters.
+                                // Passenger aircraft - but exclude helicopters and blimps.
                                 TransportInfo transportInfo = airTransportStationAI.m_transportInfo;
-                                if (transportInfo != null && transportInfo.m_transportType == TransportInfo.TransportType.Helicopter)
+                                if (transportInfo != null && (transportInfo.m_transportType == TransportInfo.TransportType.Helicopter || transportInfo.m_netLayer == ItemClass.Layer.BlimpPaths))
                                 {
                                     return 0;
                                 }
