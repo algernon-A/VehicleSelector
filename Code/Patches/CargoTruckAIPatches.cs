@@ -150,10 +150,16 @@ namespace VehicleSelector
             }
         }
 
+        internal static void CheckMods()
+        {
+            CheckBargesMod();
+            CheckAFTMod();
+        }
+
         /// <summary>
         /// Checks for the Barges mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
         /// </summary>
-        internal static void CheckMods()
+        internal static void CheckBargesMod()
         {
             try
             {
@@ -166,11 +172,24 @@ namespace VehicleSelector
                         Logging.Message("got delegate to barges mod");
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from barges mod");
+            }
+        }
 
+        /// <summary>
+        /// Checks for the AFT mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckAFTMod()
+        {
+            try
+            {
                 Assembly aft = AssemblyUtils.GetEnabledAssembly("AdditionalFreightTransporters");
                 if (aft != null)
                 {
-                    s_aftVehicleDelegate = AccessTools.MethodDelegate<AFTVehicleDelegate>(AccessTools.Method(barges.GetType("AdditionalFreightTransporters.HarmonyPatches.CargoTruckAIPatch"), "GetCargoVehicleInfo"));
+                    s_aftVehicleDelegate = AccessTools.MethodDelegate<AFTVehicleDelegate>(AccessTools.Method(aft.GetType("AdditionalFreightTransporters.HarmonyPatches.CargoTruckAIPatch"), "GetCargoVehicleInfo"));
                     if (s_aftVehicleDelegate != null)
                     {
                         Logging.Message("got delegate to aft mod");
@@ -179,7 +198,7 @@ namespace VehicleSelector
             }
             catch (Exception e)
             {
-                Logging.LogException(e, "exception getting delegate from barges mod or aft mod");
+                Logging.LogException(e, "exception getting delegate from aft mod");
             }
         }
     }
