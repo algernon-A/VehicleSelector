@@ -142,14 +142,6 @@ namespace VehicleSelector
                         transfers[0].Title = Translations.Translate("HELI_POLICE");
                         transfers[0].Reason = TransferManager.TransferReason.Crime;
 
-                        // Prison Helicopter Mod.
-                        if ((buildingFlags & Building.Flags.Downgrading) != 0)
-                        {
-                            transfers[1].Title = Translations.Translate("HELI_PRISON");
-                            transfers[1].Reason = (TransferManager.TransferReason)121;
-                            return 2;
-                        }
-
                         return 1;
                     }
                     else if (buildingInfo.m_buildingAI is BankOfficeAI)
@@ -172,23 +164,9 @@ namespace VehicleSelector
                         }
                         else
                         {
-                            // Normal police station.
                             // Police service.
                             transfers[0].Title = Translations.Translate("POLICECAR");
                             transfers[0].Reason = TransferManager.TransferReason.Crime;
-
-                            // Prison Helicopter Mod.
-                            if (buildingInfo.m_buildingAI.GetType().Name.Equals("PrisonCopterPoliceStationAI"))
-                            {
-                                // Big (central) police station.
-                                if ((buildingFlags & Building.Flags.Downgrading) != 0)
-                                {
-                                    // Collect prisoners from smaller stations by sending a prison van.
-                                    transfers[1].Title = Translations.Translate("PRISONVAN");
-                                    transfers[1].Reason = (TransferManager.TransferReason)120;
-                                    return 2;
-                                }
-                            }
 
                             return 1;
                         }

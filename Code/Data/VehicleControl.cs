@@ -299,11 +299,6 @@ namespace VehicleSelector
                 effectiveSubService = ItemClass.SubService.PublicTransportTrain;
                 effectiveLevel = ItemClass.Level.Level4;
             }
-            else if (transferReason == (TransferManager.TransferReason)120 || transferReason == (TransferManager.TransferReason)121)
-            {
-                // Prison helicopter mod transfers.
-                effectiveLevel = ItemClass.Level.Level4;
-            }
 
             // Populate return values.
             service = effectiveService;

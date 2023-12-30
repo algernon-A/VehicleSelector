@@ -51,7 +51,7 @@ namespace VehicleSelector
                 yield return prisonHeliAI;
             }
 
-            MethodInfo heliDepotAI = Type.GetType("PrisonHelicopter.HarmonyPatches.HelicopterDepotAIPatch,PrisonHelicopter", false)?.GetMethod("StartTransfer");
+            MethodInfo heliDepotAI = Type.GetType("PrisonHelicopter.AI.PoliceHelicopterDepotAI,PrisonHelicopter", false)?.GetMethod("StartTransfer");
             if (heliDepotAI != null)
             {
                 yield return heliDepotAI;
