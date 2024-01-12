@@ -142,14 +142,6 @@ namespace VehicleSelector
                         transfers[0].Title = Translations.Translate("HELI_POLICE");
                         transfers[0].Reason = TransferManager.TransferReason.Crime;
 
-                        // Prison Helicopter Mod.
-                        if ((buildingFlags & Building.Flags.Downgrading) != 0)
-                        {
-                            transfers[1].Title = Translations.Translate("HELI_PRISON");
-                            transfers[1].Reason = (TransferManager.TransferReason)121;
-                            return 2;
-                        }
-
                         return 1;
                     }
                     else if (buildingInfo.m_buildingAI is BankOfficeAI)
@@ -172,23 +164,9 @@ namespace VehicleSelector
                         }
                         else
                         {
-                            // Normal police station.
                             // Police service.
                             transfers[0].Title = Translations.Translate("POLICECAR");
                             transfers[0].Reason = TransferManager.TransferReason.Crime;
-
-                            // Prison Helicopter Mod.
-                            if (buildingInfo.m_buildingAI.GetType().Name.Equals("PrisonCopterPoliceStationAI"))
-                            {
-                                // Big (central) police station.
-                                if ((buildingFlags & Building.Flags.Downgrading) != 0)
-                                {
-                                    // Collect prisoners from smaller stations by sending a prison van.
-                                    transfers[1].Title = Translations.Translate("PRISONVAN");
-                                    transfers[1].Reason = (TransferManager.TransferReason)120;
-                                    return 2;
-                                }
-                            }
 
                             return 1;
                         }
@@ -430,9 +408,9 @@ namespace VehicleSelector
                         case ItemClass.SubService.PublicTransportPlane:
                             if (buildingInfo.m_buildingAI is TransportStationAI airTransportStationAI)
                             {
-                                // Passenger aircraft - but exclude helicopters.
+                                // Passenger aircraft - but exclude helicopters and blimps.
                                 TransportInfo transportInfo = airTransportStationAI.m_transportInfo;
-                                if (transportInfo != null && transportInfo.m_transportType == TransportInfo.TransportType.Helicopter)
+                                if (transportInfo != null && (transportInfo.m_transportType == TransportInfo.TransportType.Helicopter || transportInfo.m_netLayer == ItemClass.Layer.BlimpPaths))
                                 {
                                     return 0;
                                 }
@@ -442,7 +420,7 @@ namespace VehicleSelector
                                 transfers[0].Reason = TransferManager.TransferReason.None;
                                 return 1;
                             }
-                            else if (buildingInfo.m_buildingAI is CargoStationAI)
+                            else if (buildingInfo.m_buildingAI is CargoStationAI || buildingInfo.m_class.m_level == ItemClass.Level.Level5)
                             {
                                 // Cargo aircraft.
                                 transfers[0].Title = Translations.Translate("AIR_CARGO");

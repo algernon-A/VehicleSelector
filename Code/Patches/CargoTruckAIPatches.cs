@@ -23,6 +23,9 @@ namespace VehicleSelector
         // Barges mod GetRandomVehicleInfo delegate.
         private static BargesVehicleDelegate s_bargesVehicleDelegate;
 
+        // AFT mod GetRandomVehicleInfo delegate.
+        private static AFTVehicleDelegate s_aftVehicleDelegate;
+
         /// <summary>
         /// Delegate to Barges mod's custom GetRandomVehicleInfo method.
         /// </summary>
@@ -34,6 +37,18 @@ namespace VehicleSelector
         /// <param name="level">Transfer level.</param>
         /// <returns>Selected VehicleInfo for spawning.</returns>
         private delegate VehicleInfo BargesVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
+
+        /// <summary>
+        /// Delegate to AFT mod's custom GetRandomVehicleInfo method.
+        /// </summary>
+        /// <param name="instance">VehicleManager instance.</param>
+        /// <param name="cargoStation1">Source cargo station.</param>
+        /// <param name="cargoStation2">Destination cargo station.</param>
+        /// <param name="service">Transfer service.</param>
+        /// <param name="subService">Transfer sub-service.</param>
+        /// <param name="level">Transfer level.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        private delegate VehicleInfo AFTVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
 
         /// <summary>
         /// Harmony transpiler for CargoTruckAI.ChangeVehicleType, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
@@ -120,6 +135,12 @@ namespace VehicleSelector
                     return s_bargesVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
                 }
 
+                // Insert check for aft mod.
+                if (s_aftVehicleDelegate != null)
+                {
+                    return s_aftVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
+                }
+
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
 
@@ -131,9 +152,18 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Checks for the Barges mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// Checks for the Barges mod or AFT mod, and if one is found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
         /// </summary>
         internal static void CheckMods()
+        {
+            CheckBargesMod();
+            CheckAFTMod();
+        }
+
+        /// <summary>
+        /// Checks for the Barges mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckBargesMod()
         {
             try
             {
@@ -150,6 +180,29 @@ namespace VehicleSelector
             catch (Exception e)
             {
                 Logging.LogException(e, "exception getting delegate from barges mod");
+            }
+        }
+
+        /// <summary>
+        /// Checks for the AFT mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckAFTMod()
+        {
+            try
+            {
+                Assembly aft = AssemblyUtils.GetEnabledAssembly("AdditionalFreightTransporters");
+                if (aft != null)
+                {
+                    s_aftVehicleDelegate = AccessTools.MethodDelegate<AFTVehicleDelegate>(AccessTools.Method(aft.GetType("AdditionalFreightTransporters.HarmonyPatches.CargoTruckAIPatch"), "GetCargoVehicleInfo"));
+                    if (s_aftVehicleDelegate != null)
+                    {
+                        Logging.Message("got delegate to aft mod");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from aft mod");
             }
         }
     }
