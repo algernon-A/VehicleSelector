@@ -27,7 +27,7 @@ namespace VehicleSelector
         {
             BuildingInfo buildingInfo = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info;
 
-            // Check eligigibility.
+            // Check eligibility.
             return BuildingEligibility(buildingID, buildingInfo, new TransferStruct[MaxTransfers]) > 0;
         }
 
@@ -63,7 +63,7 @@ namespace VehicleSelector
                         transfers[0].Reason = TransferManager.TransferReason.Dead;
                         transfers[0].Title = Translations.Translate("HEARSE");
 
-                        // Outgoing transfers - cemetaries only.
+                        // Outgoing transfers - cemeteries only.
                         if (cemeteryAI.m_graveCount > 0)
                         {
                             transfers[1].Reason = TransferManager.TransferReason.DeadMove;
@@ -134,8 +134,6 @@ namespace VehicleSelector
                     return 0;
 
                 case ItemClass.Service.PoliceDepartment:
-                    Building.Flags buildingFlags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
-
                     // Police helicopter depot.
                     if (buildingInfo.m_buildingAI is HelicopterDepotAI)
                     {
@@ -518,7 +516,7 @@ namespace VehicleSelector
                         // Waste Processing Complex.
                         else if (buildingInfo.GetClassLevel() == ItemClass.Level.Level4)
                         {
-                            // Garbage Transfer for proccessing from Waste Transfer Facility and Landfill Site.
+                            // Garbage Transfer for processing from Waste Transfer Facility and Landfill Site.
                             transfers[0].Title = Translations.Translate("GARBAGE_TRANSFER");
                             transfers[0].Reason = TransferManager.TransferReason.GarbageTransfer;
 
