@@ -7,7 +7,6 @@ namespace VehicleSelector
 {
     using AlgernonCommons.Translation;
     using ColossalFramework;
-    using Epic.OnlineServices.Presence;
 
     /// <summary>
     /// Transfer data management.
