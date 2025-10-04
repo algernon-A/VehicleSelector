@@ -150,7 +150,11 @@ namespace VehicleSelector
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(isIncoming ? cargoStationDest : cargoStationSource, reason);
             if (vehicleList == null)
             {
-                // No custom vehicle selection - use game method.
+                // Insert check for No Big Truck mod.
+                if (s_NBTGetRandomVehicleInfoDelegate != null && !(sourceStation?.m_class?.name == "Helicopter Cargo Facility" || sourceStation?.m_class?.name == "Ferry Cargo Facility"))
+                {
+                    return s_NBTGetRandomVehicleInfoDelegate.Invoke(vehicleManager, ref r, service, subService, level, cargoStationSource, cargoStationDest, material);
+                }
 
                 // Insert check for barges mod.
                 if (s_bargesVehicleDelegate != null)
@@ -164,12 +168,7 @@ namespace VehicleSelector
                     return s_aftVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
                 }
 
-                // Insert check for No Big Truck mod.
-                if (s_NBTGetRandomVehicleInfoDelegate != null)
-                {
-                    return s_NBTGetRandomVehicleInfoDelegate.Invoke(vehicleManager, ref r, service, subService, level, cargoStationSource, cargoStationDest, material);
-                }
-
+                // No custom vehicle selection - use game method.
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
 
