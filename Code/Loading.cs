@@ -26,8 +26,11 @@ namespace VehicleSelector
             // Check for TLM.
             TransportStationAIPatches.CheckMods();
 
-            // Check for barges mod.
+            // Check for barges and No Big Truck mod.
             CargoTruckAIPatches.CheckMods();
+
+            // Check for No Big Truck mod.
+            WarehouseStartTransferPatch.CheckMods();
         }
 
         /// <summary>

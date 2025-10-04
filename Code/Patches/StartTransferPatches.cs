@@ -105,6 +105,19 @@ namespace VehicleSelector
                     // Add buildingID and material params to call, restoring any original labels against the insert start.
                     yield return new CodeInstruction(OpCodes.Ldarg_1) { labels = labels };
                     yield return new CodeInstruction(OpCodes.Ldarg_3);
+
+                    // If this is an IndustrialBuildingAI or IndustrialExtractorAI, then we need to add the targetBuildingId parameter for No Big Truck mod compatibility.
+                    if (original.DeclaringType.Name == "IndustrialBuildingAI" || original.DeclaringType.Name == "IndustrialExtractorAI")
+                    {
+                        // Add targetBuildingId parameter to call for No Big Truck mod.
+                        yield return new CodeInstruction(OpCodes.Ldarga_S, original.IsStatic ? 3 : 4);
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(TransferManager.TransferOffer), nameof(TransferManager.TransferOffer.Building)));
+                    }
+                    else
+                    {
+                        yield return new CodeInstruction(OpCodes.Ldc_I4_0);
+                    }
+
                     instruction = new CodeInstruction(OpCodes.Call, chooseVehicle);
                     Logging.Message("transpiled");
                 }
@@ -116,6 +129,19 @@ namespace VehicleSelector
                     // Add buildingID and material params to call.
                     yield return new CodeInstruction(OpCodes.Ldarg_1);
                     yield return new CodeInstruction(OpCodes.Ldarg_3);
+
+                    // If this is an IndustrialBuildingAI or IndustrialExtractorAI, then we need to add the targetBuildingId parameter for No Big Truck mod compatibility.
+                    if (original.DeclaringType.Name == "IndustrialBuildingAI" || original.DeclaringType.Name == "IndustrialExtractorAI")
+                    {
+                        // Add targetBuildingId parameter to call for No Big Truck mod.
+                        yield return new CodeInstruction(OpCodes.Ldarga_S, original.IsStatic ? 3 : 4);
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(TransferManager.TransferOffer), nameof(TransferManager.TransferOffer.Building)));
+                    }
+                    else
+                    {
+                        yield return new CodeInstruction(OpCodes.Ldc_I4_0);
+                    }
+
                     instruction = new CodeInstruction(OpCodes.Call, chooseVehicleType);
                     Logging.Message("transpiled");
                 }
@@ -160,13 +186,20 @@ namespace VehicleSelector
         /// <param name="level">Vehicle level.</param>
         /// <param name="buildingID">Building ID of owning building.</param>
         /// <param name="material">Transfer material.</param>
+        /// <param name="targetBuildingId">Target building ID.</param>
         /// <returns>Vehicle prefab to spawn.</returns>
-        public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort buildingID, TransferManager.TransferReason material)
+        public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort buildingID, TransferManager.TransferReason material, ushort targetBuildingId)
         {
             // Get any custom vehicle list for this building.
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, material);
             if (vehicleList == null)
             {
+                // Insert check for No Big Truck mod.
+                if (CargoTruckAIPatches.s_NBTGetRandomVehicleInfoDelegate != null && targetBuildingId != default)
+                {
+                    return CargoTruckAIPatches.s_NBTGetRandomVehicleInfoDelegate.Invoke(vehicleManager, ref r, service, subService, level, buildingID, targetBuildingId, material);
+                }
+
                 // No custom vehicle selection - use game method.
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
@@ -190,13 +223,20 @@ namespace VehicleSelector
         /// <param name="type">Vehicle type.</param>
         /// <param name="buildingID">Building ID of owning building.</param>
         /// <param name="material">Transfer material.</param>
+        /// <param name="targetBuildingId">Target building ID.</param>
         /// <returns>Vehicle prefab to spawn.</returns>
-        public static VehicleInfo ChooseVehicleType(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type, ushort buildingID, TransferManager.TransferReason material)
+        public static VehicleInfo ChooseVehicleType(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, VehicleInfo.VehicleType type, ushort buildingID, TransferManager.TransferReason material, ushort targetBuildingId)
         {
             // Get any custom vehicle list for this build
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, material);
             if (vehicleList == null)
             {
+                // Insert check for No Big Truck mod.
+                if (CargoTruckAIPatches.s_NBTGetRandomVehicleInfoDelegate != null && targetBuildingId != default)
+                {
+                    return CargoTruckAIPatches.s_NBTGetRandomVehicleInfoDelegate.Invoke(vehicleManager, ref r, service, subService, level, buildingID, targetBuildingId, material);
+                }
+
                 // No custom vehicle selection - use game method.
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level, type);
             }
