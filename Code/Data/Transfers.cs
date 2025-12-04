@@ -5,6 +5,7 @@
 
 namespace VehicleSelector
 {
+    using AlgernonCommons;
     using AlgernonCommons.Translation;
     using ColossalFramework;
 
@@ -17,6 +18,22 @@ namespace VehicleSelector
         /// Maximum number of transfer types supported per building.
         /// </summary>
         internal const int MaxTransfers = 3;
+
+        // Transfer reason to use for police helicopters.  Can be overriden if Transfer Controller is present with that mod's custom transfer reason
+        private static TransferManager.TransferReason _policeHelicopterTransferReason = TransferManager.TransferReason.Crime;
+
+        /// <summary>
+        /// Checks if the mod Transfer Manager: Community Edition is present and active.
+        /// If so, this mod will then recognise TM:CE's custom transfer reason for police helicopters.
+        /// </summary>
+        internal static void CheckMods()
+        {
+            // TM:CE adds a custom transfer reason for police helicopters.
+            if (AssemblyUtils.GetEnabledAssembly("TransferManagerCE") != null)
+            {
+                _policeHelicopterTransferReason = (TransferManager.TransferReason)127;
+            }
+        }
 
         /// <summary>
         /// Checks if the given building has supported transfer types.
@@ -138,7 +155,7 @@ namespace VehicleSelector
                     if (buildingInfo.m_buildingAI is HelicopterDepotAI)
                     {
                         transfers[0].Title = Translations.Translate("HELI_POLICE");
-                        transfers[0].Reason = TransferManager.TransferReason.Crime;
+                        transfers[0].Reason = _policeHelicopterTransferReason;
 
                         return 1;
                     }

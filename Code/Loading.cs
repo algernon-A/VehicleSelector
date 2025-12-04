@@ -28,6 +28,9 @@ namespace VehicleSelector
 
             // Check for barges mod.
             CargoTruckAIPatches.CheckMods();
+
+            // Check for TM:CE.
+            Transfers.CheckMods();
         }
 
         /// <summary>
