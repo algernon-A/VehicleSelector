@@ -62,7 +62,7 @@ namespace VehicleSelector
             {
                 // Healthcare.
                 case ItemClass.Service.HealthCare:
-                    if (buildingInfo.m_buildingAI is HospitalAI)
+                    if (buildingInfo.m_buildingAI is HospitalAI || buildingInfo.m_buildingAI.GetType().Name.Equals("UniversityHospitalAI"))
                     {
                         // Ambulances.
                         transfers[0].Reason = TransferManager.TransferReason.Sick;
