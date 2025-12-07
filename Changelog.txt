@@ -1,4 +1,9 @@
-﻿Version 1.4.5 -
+﻿Version 1.4.6 -
+
+- Add support for Custom AIs mod university hospital (patches submitted by t1a2l)
+
+
+Version 1.4.5 -
 
 - Add support for TM:CE custom police helicopter transfer type
 
