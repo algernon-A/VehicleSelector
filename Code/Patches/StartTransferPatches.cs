@@ -56,6 +56,12 @@ namespace VehicleSelector
             {
                 yield return heliDepotAI;
             }
+
+            MethodInfo universityHospitalAI = Type.GetType("CombinedAIS.AI.UniversityHospitalAI,CombinedAIS", false)?.GetMethod("StartTransfer");
+            if (universityHospitalAI != null)
+            {
+                yield return universityHospitalAI;
+            }
         }
 
         /// <summary>

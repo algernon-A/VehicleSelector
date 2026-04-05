@@ -31,6 +31,8 @@ namespace VehicleSelector
 
             // Check for No Big Truck mod.
             WarehouseStartTransferPatch.CheckMods();
+            // Check for TM:CE.
+            Transfers.CheckMods();
         }
 
         /// <summary>
