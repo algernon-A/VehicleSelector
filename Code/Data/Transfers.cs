@@ -157,20 +157,12 @@ namespace VehicleSelector
                         transfers[0].Title = Translations.Translate("HELI_POLICE");
                         transfers[0].Reason = _policeHelicopterTransferReason;
 
-                        return 1;
-                    }
-                    else if (buildingInfo.m_buildingAI.GetType().Name.Equals("PoliceHelicopterDepotAI"))
-                    {
-                        transfers[0].Title = Translations.Translate("HELI_POLICE");
-                        transfers[0].Reason = _policeHelicopterTransferReason;
-
                         var flags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
 
-                        if ((flags & Building.Flags.Downgrading) != 0)
+                        if (buildingInfo.m_buildingAI.GetType().Name.Equals("PoliceHelicopterDepotAI") && (flags & Building.Flags.Downgrading) != 0)
                         {
                             transfers[1].Title = Translations.Translate("HELI_PRISON");
                             transfers[1].Reason = (TransferManager.TransferReason)224;
-
                             return 2;
                         }
 
@@ -202,7 +194,7 @@ namespace VehicleSelector
 
                             var flags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
 
-                            if ((flags & Building.Flags.Downgrading) != 0)
+                            if (buildingInfo.m_buildingAI.GetType().Name.Equals("PrisonCopterPoliceStationAI") && (flags & Building.Flags.Downgrading) != 0)
                             {
                                 // police van for prisoner transport
                                 transfers[1].Title = Translations.Translate("PRISONVAN");
