@@ -157,9 +157,10 @@ namespace VehicleSelector
                         transfers[0].Title = Translations.Translate("HELI_POLICE");
                         transfers[0].Reason = _policeHelicopterTransferReason;
 
-                        var flags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
+                        Building.Flags buildingFlags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
 
-                        if (buildingInfo.m_buildingAI.GetType().Name.Equals("PoliceHelicopterDepotAI") && (flags & Building.Flags.Downgrading) != 0)
+                        // Support prisner transport via Prison Helicopter mod.
+                        if (buildingInfo.m_buildingAI.GetType().Name.Equals("PoliceHelicopterDepotAI") && (buildingFlags & Building.Flags.Downgrading) != Building.Flags.None)
                         {
                             transfers[1].Title = Translations.Translate("HELI_PRISON");
                             transfers[1].Reason = (TransferManager.TransferReason)224;
@@ -192,11 +193,11 @@ namespace VehicleSelector
                             transfers[0].Title = Translations.Translate("POLICECAR");
                             transfers[0].Reason = TransferManager.TransferReason.Crime;
 
-                            var flags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
+                            Building.Flags buildingFlags = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags;
 
-                            if (buildingInfo.m_buildingAI.GetType().Name.Equals("PrisonCopterPoliceStationAI") && (flags & Building.Flags.Downgrading) != 0)
+                            if (buildingInfo.m_buildingAI.GetType().Name.Equals("PrisonCopterPoliceStationAI") && (buildingFlags & Building.Flags.Downgrading) != Building.Flags.None)
                             {
-                                // police van for prisoner transport
+                                // Police van for prisoner transport (Prison Helicopter mod).
                                 transfers[1].Title = Translations.Translate("PRISONVAN");
                                 transfers[1].Reason = (TransferManager.TransferReason)223;
 

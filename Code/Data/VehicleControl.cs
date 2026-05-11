@@ -301,6 +301,7 @@ namespace VehicleSelector
             }
             else if (originalService == ItemClass.Service.PoliceDepartment && originalClass.m_subService != ItemClass.SubService.PoliceDepartmentBank && (transferReason == (TransferManager.TransferReason)223 || transferReason == (TransferManager.TransferReason)224))
             {
+                // Prison helicopter mod.
                 effectiveLevel = ItemClass.Level.Level4;
             }
 
