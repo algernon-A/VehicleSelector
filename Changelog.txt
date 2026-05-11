@@ -1,4 +1,9 @@
-﻿Version 1.4.6 -
+﻿Version 1.4.7 -
+
+- Update support for mods by t1a2l (patches submitted by t1a2l)
+
+
+Version 1.4.6 -
 
 - Add support for Custom AIs mod university hospital (patches submitted by t1a2l)
 
