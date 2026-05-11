@@ -299,6 +299,10 @@ namespace VehicleSelector
                 effectiveSubService = ItemClass.SubService.PublicTransportTrain;
                 effectiveLevel = ItemClass.Level.Level4;
             }
+            else if (originalService == ItemClass.Service.PoliceDepartment && originalClass.m_subService != ItemClass.SubService.PoliceDepartmentBank && (transferReason == (TransferManager.TransferReason)223 || transferReason == (TransferManager.TransferReason)224))
+            {
+                effectiveLevel = ItemClass.Level.Level4;
+            }
 
             // Populate return values.
             service = effectiveService;
