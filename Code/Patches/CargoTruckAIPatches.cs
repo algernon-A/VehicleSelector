@@ -26,6 +26,9 @@ namespace VehicleSelector
         // AFT mod GetRandomVehicleInfo delegate.
         private static AFTVehicleDelegate s_aftVehicleDelegate;
 
+        // NoBigTruck mod GetRandomVehicleInfo delegate.
+        internal static NBTDelegate s_NBTGetRandomVehicleInfoDelegate;
+
         /// <summary>
         /// Delegate to Barges mod's custom GetRandomVehicleInfo method.
         /// </summary>
@@ -49,6 +52,20 @@ namespace VehicleSelector
         /// <param name="level">Transfer level.</param>
         /// <returns>Selected VehicleInfo for spawning.</returns>
         private delegate VehicleInfo AFTVehicleDelegate(VehicleManager instance, ushort cargoStation1, ushort cargoStation2, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level);
+
+        /// <summary>
+        /// Delegate to NoBigTruck mod's custom GetRandomVehicleInfo method.
+        /// </summary>
+        /// <param name="manager">VehicleManager instance.</param>
+        /// <param name="r">Randomizer reference.</param>
+        /// <param name="service">Vehicle service.</param>
+        /// <param name="subService">Vehicle subservice.</param>
+        /// <param name="level">Vehicle level.</param>
+        /// <param name="sourceBuildingId">Source cargo station.</param>
+        /// <param name="targetBuildingId">Destination cargo station.</param>
+        /// <param name="material">Vehicle's transfer reason.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        internal delegate VehicleInfo NBTDelegate(VehicleManager manager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort sourceBuildingId, ushort targetBuildingId, TransferManager.TransferReason material);
 
         /// <summary>
         /// Harmony transpiler for CargoTruckAI.ChangeVehicleType, replacing existing calls to VehicleManager.GetRandomVehicleInfo with a call to our custom replacement instead.
@@ -84,6 +101,11 @@ namespace VehicleSelector
                     yield return new CodeInstruction(OpCodes.Ldloc_S, 6);
                     yield return new CodeInstruction(OpCodes.Ldloc_S, 7);
                     yield return new CodeInstruction(OpCodes.Ldloc_2);
+
+                    // Get material parameter for No Big Truck mod.
+                    yield return new CodeInstruction(OpCodes.Ldarg_2);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Vehicle), nameof(Vehicle.m_transferType)));
+
                     instruction = new CodeInstruction(OpCodes.Call, chooseVehicle);
                 }
 
@@ -103,8 +125,9 @@ namespace VehicleSelector
         /// <param name="cargoStationSource">Cargo station (if any) at vehicle path's current position.</param>
         /// <param name="cargoStationDest">Cargo station (if any) at vehicle path's previous position.</param>
         /// <param name="buildingManager">BuildingManager instance.</param>
+        /// <param name="material">Vehicle's transfer reason.</param>
         /// <returns>Vehicle prefab to spawn.</returns>
-        public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort cargoStationSource, ushort cargoStationDest, BuildingManager buildingManager)
+        public static VehicleInfo ChooseVehicle(VehicleManager vehicleManager, ref Randomizer r, ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level, ushort cargoStationSource, ushort cargoStationDest, BuildingManager buildingManager, TransferManager.TransferReason material)
         {
             // Determine transfer direction.
             Building[] buildings = buildingManager.m_buildings.m_buffer;
@@ -127,7 +150,11 @@ namespace VehicleSelector
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(isIncoming ? cargoStationDest : cargoStationSource, reason);
             if (vehicleList == null)
             {
-                // No custom vehicle selection - use game method.
+                // Insert check for No Big Truck mod.
+                if (s_NBTGetRandomVehicleInfoDelegate != null && !(sourceStation?.m_class?.name == "Helicopter Cargo Facility" || sourceStation?.m_class?.name == "Ferry Cargo Facility"))
+                {
+                    return s_NBTGetRandomVehicleInfoDelegate.Invoke(vehicleManager, ref r, service, subService, level, cargoStationSource, cargoStationDest, material);
+                }
 
                 // Insert check for barges mod.
                 if (s_bargesVehicleDelegate != null)
@@ -141,6 +168,7 @@ namespace VehicleSelector
                     return s_aftVehicleDelegate.Invoke(vehicleManager, cargoStationSource, cargoStationDest, service, subService, level);
                 }
 
+                // No custom vehicle selection - use game method.
                 return vehicleManager.GetRandomVehicleInfo(ref r, service, subService, level);
             }
 
@@ -152,12 +180,13 @@ namespace VehicleSelector
         }
 
         /// <summary>
-        /// Checks for the Barges mod or AFT mod, and if one is found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// Checks for the Barges mod / AFT mod, and No Big Truck mod, if two of them is found, creates the delegate to their custom method for CargoTruckAI.ChangeVehicleType.
         /// </summary>
         internal static void CheckMods()
         {
             CheckBargesMod();
             CheckAFTMod();
+            CheckNBTMod();
         }
 
         /// <summary>
@@ -203,6 +232,29 @@ namespace VehicleSelector
             catch (Exception e)
             {
                 Logging.LogException(e, "exception getting delegate from aft mod");
+            }
+        }
+
+        /// <summary>
+        /// Checks for the No Big Truck mod, and if found, creates the delegate to its custom method for CargoTruckAI.ChangeVehicleType.
+        /// </summary>
+        internal static void CheckNBTMod()
+        {
+            try
+            {
+                Assembly noBigTruck = AssemblyUtils.GetEnabledAssembly("NoBigTruck");
+                if (noBigTruck != null)
+                {
+                    s_NBTGetRandomVehicleInfoDelegate = AccessTools.MethodDelegate<NBTDelegate>(AccessTools.Method(noBigTruck.GetType("NoBigTruck.Manager"), "GetRandomVehicleInfo"));
+                    if (s_NBTGetRandomVehicleInfoDelegate != null)
+                    {
+                        Logging.Message("got delegate to No Big Truck mod (NoBigTruck.Manager.GetRandomVehicleInfo)");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from No Big Truck mod (NoBigTruck.Manager.GetRandomVehicleInfo)");
             }
         }
     }

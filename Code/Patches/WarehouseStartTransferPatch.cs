@@ -5,6 +5,7 @@
 
 namespace VehicleSelector
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -19,6 +20,19 @@ namespace VehicleSelector
     [HarmonyBefore("NoBigTruck")]
     public static class WarehouseStartTransferPatch
     {
+        private static NBTDelegate s_NBTGetTransferVehicleServiceDelegate;
+
+        /// <summary>
+        /// Delegate to NoBigTruck mod's custom GetTransferVehicleService method.
+        /// </summary>
+        /// <param name="material">Vehicle's transfer reason.</param>
+        /// <param name="level">Vehicle level.</param>
+        /// <param name="randomizer">Randomizer reference.</param>
+        /// <param name="targetBuildingId">Destination cargo station.</param>
+        /// <param name="sourceBuildingId">Source cargo station.</param>
+        /// <returns>Selected VehicleInfo for spawning.</returns>
+        internal delegate VehicleInfo NBTDelegate(TransferManager.TransferReason material, ItemClass.Level level, ref Randomizer randomizer, ushort targetBuildingId, ushort sourceBuildingId);
+
         /// <summary>
         /// Target methods.
         /// </summary>
@@ -58,6 +72,19 @@ namespace VehicleSelector
                 {
                     // Add buildingID and material params to call.
                     yield return new CodeInstruction(OpCodes.Ldarg_1);
+
+                    // If this is an WarehouseAI, then we need to add the sourceBuildingId parameter for No Big Truck mod compatibility.
+                    if (original.DeclaringType.Name == "WarehouseAI")
+                    {
+                        // Add sourceBuildingId parameter to call for No Big Truck mod.
+                        yield return new CodeInstruction(OpCodes.Ldarga_S, 4);
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(TransferManager.TransferOffer), nameof(TransferManager.TransferOffer.Building)));
+                    }
+                    else
+                    {
+                        yield return new CodeInstruction(OpCodes.Ldc_I4_0);
+                    }
+
                     instruction = new CodeInstruction(OpCodes.Call, chooseVehicle);
                     Logging.Message("transpiled");
                 }
@@ -74,13 +101,20 @@ namespace VehicleSelector
         /// <param name="level">Vehicle level.</param>
         /// <param name="randomizer">Randomizer reference.</param>
         /// <param name="buildingID">Building ID of owning building.</param>
+        /// <param name="sourceBuildingId">Source building ID.</param>
         /// <returns>Vehicle prefab to spawn.</returns>
-        public static VehicleInfo ChooseVehicle(TransferManager.TransferReason material, ItemClass.Level level, ref Randomizer randomizer, ushort buildingID)
+        public static VehicleInfo ChooseVehicle(TransferManager.TransferReason material, ItemClass.Level level, ref Randomizer randomizer, ushort buildingID, ushort sourceBuildingId)
         {
             // Get any custom vehicle list for this building.
             List<VehicleInfo> vehicleList = VehicleControl.GetVehicles(buildingID, material);
             if (vehicleList == null)
             {
+                // Insert check for No Big Truck mod.
+                if (s_NBTGetTransferVehicleServiceDelegate != null && sourceBuildingId != default)
+                {
+                    return s_NBTGetTransferVehicleServiceDelegate.Invoke(material, level, ref randomizer, buildingID, sourceBuildingId);
+                }
+
                 // No custom vehicle selection - use game method.
                 return WarehouseAI.GetTransferVehicleService(material, level, ref randomizer);
             }
@@ -89,6 +123,37 @@ namespace VehicleSelector
             int i = randomizer.Int32((uint)vehicleList.Count);
             {
                 return vehicleList[i];
+            }
+        }
+
+        /// <summary>
+        /// Checks for the No Big Truck mod, if one is found, creates the delegate to its custom method for WarehouseAI.GetTransferVehicleService.
+        /// </summary>
+        internal static void CheckMods()
+        {
+            CheckNBTMod();
+        }
+
+        /// <summary>
+        /// Checks for the No Big Truck mod, and if found, creates the delegate to its custom method for WarehouseAI.GetTransferVehicleService.
+        /// </summary>
+        internal static void CheckNBTMod()
+        {
+            try
+            {
+                Assembly noBigTruck = AssemblyUtils.GetEnabledAssembly("NoBigTruck");
+                if (noBigTruck != null)
+                {
+                    s_NBTGetTransferVehicleServiceDelegate = AccessTools.MethodDelegate<NBTDelegate>(AccessTools.Method(noBigTruck.GetType("NoBigTruck.Manager"), "GetTransferVehicleService"));
+                    if (s_NBTGetTransferVehicleServiceDelegate != null)
+                    {
+                        Logging.Message("got delegate to No Big Truck mod (NoBigTruck.Manager.GetTransferVehicleService)");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception getting delegate from No Big Truck mod (NoBigTruck.Manager.GetTransferVehicleService)");
             }
         }
     }
